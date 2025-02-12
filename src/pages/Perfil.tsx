@@ -12,7 +12,7 @@ const Perfil: React.FC = () => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar si el formulario está siendo enviado
   
-  const fotoPorDefecto = '/perfil_default.png';
+  const fotoPorDefecto = '/assets/perfil_default.png';
 
   const handleFotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {

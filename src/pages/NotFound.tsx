@@ -2,7 +2,7 @@ const NotFound = () => {
   return (
     <div className="flex h-[calc(100vh-256px)] flex-col items-center justify-center text-center">
       <img 
-        src="/not_found.png" 
+        src="/assets/not_found.png" 
         alt="Not Found" 
         className="mt-4 max-w-xs" 
       />

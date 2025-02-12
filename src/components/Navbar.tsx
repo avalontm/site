@@ -75,7 +75,7 @@ const Navbar: React.FC = () => {
                   className="flex items-center justify-center rounded-full bg-gray-700 p-2 text-sm font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-300 dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
                 >
                   <img
-                    src={user?.avatar || '/perfil_default.png'}
+                    src={user?.avatar || '/assets/perfil_default.png'}
                     alt="Avatar"
                     className="size-10 rounded-full object-cover"
                   />

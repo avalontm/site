@@ -17,7 +17,7 @@ export const AuthProvider: React.FC = ({ children }) => {
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true); // Estado de carga
   const [user, setUser] = useState<{ avatar: string; name: string }>({
-    avatar: '/perfil_default.png', // Avatar predeterminado
+    avatar: '/assets/perfil_default.png', // Avatar predeterminado
     name: '', // Nombre predeterminado
   });
 
@@ -33,7 +33,7 @@ export const AuthProvider: React.FC = ({ children }) => {
     if (token && userRole) {
       setIsAuthenticated(true);
       setUser({
-        avatar: userAvatar && userAvatar.trim() !== "" ? userAvatar : '/perfil_default.png',
+        avatar: userAvatar && userAvatar.trim() !== "" ? userAvatar : '/assets/perfil_default.png',
         name: userName || ''
       });
       setRole(userRole); // Establecer el rol
@@ -53,7 +53,7 @@ export const AuthProvider: React.FC = ({ children }) => {
     localStorage.setItem('authToken', token);
     localStorage.setItem('userRole', role);
     localStorage.setItem('userName', name); // Guardar el nombre del usuario
-    localStorage.setItem('userAvatar', avatar || '/perfil_default.png');  // Guardar el avatar del usuario
+    localStorage.setItem('userAvatar', avatar || '/assets/perfil_default.png');  // Guardar el avatar del usuario
 
     setUser({
       avatar: avatar,
@@ -71,7 +71,7 @@ export const AuthProvider: React.FC = ({ children }) => {
     setIsAuthenticated(false);
     setRole(null);
     setUser({
-      avatar: '/perfil_default.png',  // Valor predeterminado
+      avatar: '/assets/perfil_default.png',  // Valor predeterminado
       name: ''
     });
   };
