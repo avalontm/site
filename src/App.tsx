@@ -1,56 +1,77 @@
-// src/App.tsx
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import ProductDetail from './components/ProductDetail';
-import Home from './pages/Home';
-import Perfil from './pages/Perfil';
-import Cart from './pages/Carrito';
-import AdminPanel from './admins/AdminPanel';
-import NotFound from './pages/NotFound';
-import { useAuth } from './AuthContext';
-import CarritoButton from './components/CarritoButton';
-import { CartProvider } from './CartContext'; // Importa el CartProvider
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Suspense, lazy } from "react";
+import Navbar from "./components/Navbar";
+import ProductDetail from "./components/ProductDetail";
+import Loading from "./components/Loading";
+
+import Home from "./pages/Home";
+import About from "./pages/About";
+import NotFound from "./pages/NotFound";
+import { useAuth } from "./AuthContext";
+import CarritoButton from "./components/CarritoButton";
+import { CartProvider } from "./CartContext";
+
+// Carga diferida (lazy loading)
+const Perfil = lazy(() => import("./pages/Perfil"));
+const Cart = lazy(() => import("./pages/Carrito"));
+const AdminPanel = lazy(() => import("./admins/AdminPanel"));
 
 const ProtectedRoute = () => {
   const { isAuthenticated, loading } = useAuth();
 
-  if (loading) {
-    return <div>Cargando...</div>;
-  }
-
+  if (loading) return <Loading />;
   return isAuthenticated ? <Outlet /> : <Navigate to="/" />;
 };
 
 const AdminRoute = () => {
   const { isAuthenticated, role, loading } = useAuth();
 
-  if (loading) {
-    return <div>Cargando...</div>;
-  }
-
-  return isAuthenticated && role === 'admin' ? <Outlet /> : <Navigate to="/" />;
+  if (loading) return <Loading />;
+  return isAuthenticated && role === "admin" ? <Outlet /> : <Navigate to="/" />;
 };
 
 function App() {
   return (
-    <CartProvider> {/* Proveemos el contexto aquí */}
+    <CartProvider>
       <BrowserRouter basename="">
         <div className="flex min-h-screen flex-col dark:bg-gray-800">
           <Navbar />
           <main className="flex flex-col items-center justify-center gap-6 p-4 sm:p-8 lg:p-16">
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
               <Route path="/product/:id" element={<ProductDetail />} />
 
               {/* Rutas protegidas para usuarios autenticados */}
               <Route element={<ProtectedRoute />}>
-                <Route path="/perfil" element={<Perfil />} />
-                <Route path="/carrito" element={<Cart />} />
+                <Route
+                  path="/perfil"
+                  element={
+                    <Suspense fallback={<Loading />}>
+                      <Perfil />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/carrito"
+                  element={
+                    <Suspense fallback={<Loading />}>
+                      <Cart />
+                    </Suspense>
+                  }
+                />
               </Route>
 
               {/* Rutas protegidas solo para administradores */}
               <Route element={<AdminRoute />}>
-                <Route path="/admin" element={<AdminPanel />} />
+                <Route
+                  path="/admin"
+                  element={
+                    <Suspense fallback={<Loading />}>
+                      <AdminPanel />
+                    </Suspense>
+                  }
+                />
               </Route>
 
               {/* Página 404 */}
@@ -58,7 +79,7 @@ function App() {
             </Routes>
           </main>
 
-          {/* Coloca el botón flotante del carrito aquí */}
+          {/* Botón flotante del carrito */}
           <CarritoButton />
         </div>
       </BrowserRouter>
