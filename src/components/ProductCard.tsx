@@ -1,71 +1,90 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useCart } from '../CartContext'; // Importa el hook useCart
 import { Product } from '../interfaces/Product';  // Importar la interfaz Product
+import { toast } from 'react-toastify'; // Importa el toast
 
 const ProductCard = ({ product }: { product: Product }) => {
   const { addToCart } = useCart(); // Usamos el contexto del carrito
-  const [showAnimation, setShowAnimation] = useState(false);  // Agregar estado para mostrar la animación de "+1"
-  const [bubbles, setBubbles] = useState<number[]>([]); // Estado para manejar las burbujas de cantidad
+  const nameRef = useRef<HTMLHeadingElement | null>(null);
+  const [isLongName, setIsLongName] = useState(false);
+  const [isHovered, setIsHovered] = useState(false); // Para saber si la tarjeta está siendo "hovered"
+
+  // Revisa si el nombre del producto es más largo que el contenedor
+  useEffect(() => {
+    if (nameRef.current) {
+      setIsLongName(nameRef.current.scrollWidth > nameRef.current.clientWidth);
+    }
+  }, [product.name]);
 
   const handleAddToCart = () => {
-    // Crear una burbuja para la animación
-    setBubbles([...bubbles, Date.now()]); // Usamos Date.now() para generar una clave única por animación
+    addToCart({
+      identifier: product.identifier,
+      name: product.name,
+      image: product.image,
+      price: product.price,
+      quantity: 1,
+    }); // Agregamos el producto al carrito
 
-    setShowAnimation(true);  // Mostrar la animación de "+1"
-    setTimeout(() => {
-      setShowAnimation(false);  // Ocultar la animación después de un tiempo
-      addToCart({
-        id: product.id,
-        name: product.name,
-        image: product.image,
-        price: product.price,
-        quantity: 1,
-      }); // Agregamos el producto al carrito
-    }, 1000);  // La animación durará 1 segundo
+    // Mostrar mensaje de éxito usando toast
+    toast.success(`${product.name} ha sido agregado al carrito`, {
+      position: "top-right", // Posición del toast
+      autoClose: 3000, // Tiempo que permanece visible (en milisegundos)
+      hideProgressBar: false, // Mostrar barra de progreso
+      closeOnClick: true, // Cerrar el toast al hacer clic
+      pauseOnHover: true, // Pausar al hacer hover
+    });
   };
+
+  // Controlar animación solo cuando el mouse está encima de la tarjeta
+  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseLeave = () => setIsHovered(false);
 
   return (
     <motion.div
       whileHover={{ scale: 1.05, rotate: 1 }}
       whileTap={{ scale: 0.95 }}
-      className="relative flex size-full max-w-sm flex-col justify-between rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+      className="relative flex max-w-sm flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      <Link to={`/product/${product.id}`}>
+      <Link to={`/product/${product.identifier}`} className="w-full">
         <img
-          className="h-[320px] w-full rounded-t-lg object-contain object-center p-8"
+          className="h-64 w-full object-contain object-center"
           src={product.image}
           alt={product.name}
         />
       </Link>
-      <div className="flex h-full flex-col justify-between px-5 pb-5">
-        <h5 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">{product.name}</h5>
-        <div className="mt-3 flex grow flex-col items-center justify-between md:flex-row">
-          <span className="text-2xl font-bold text-gray-900 dark:text-white">${product.price.toFixed(2)}</span>
+      <div className="flex flex-col p-4">
+        <h5
+          ref={nameRef} // Asignamos la referencia al título
+          className={`text-xl font-semibold text-gray-900 dark:text-white ${isLongName && isHovered ? 'animate-scrollText' : ''}`}
+          style={{
+            whiteSpace: 'nowrap', // Impide el salto de línea
+            overflow: isHovered && isLongName ? 'visible' : 'hidden', // Si se está animando, el texto se muestra completo
+            textOverflow: isHovered && isLongName ? 'unset' : 'ellipsis', // Quita "..." si el texto está siendo animado
+            transform: isHovered ? 'translateX(0)' : 'translateX(0)', // Mantiene la posición original
+            animationPlayState: isHovered && isLongName ? 'running' : 'paused', // Controla la animación dependiendo del estado del hover
+            paddingLeft: isHovered && isLongName ? '10px' : '0px',  // Agregar padding a la izquierda solo cuando se anime
+            paddingRight: isHovered && isLongName ? '10px' : '0px', // Agregar padding a la derecha solo cuando se anime
+          }}
+        >
+          {product.name}
+        </h5>
+
+        <div className="mt-4 flex items-center justify-between">
+          <span className="text-xl font-bold text-gray-900 dark:text-white">${product.price.toFixed(2)}</span>
+
           {/* Botón con animación */}
           <button
-            className="relative mt-3 rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 md:mt-0"
+            className="mt-3 rounded-lg bg-blue-700 px-6 py-2 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             onClick={handleAddToCart}
           >
             Agregar al carrito
           </button>
         </div>
       </div>
-
-      {/* Animación de las burbujas */}
-      {bubbles.map((timestamp) => (
-        <motion.div
-          key={timestamp}
-          className="absolute flex items-center justify-center rounded-full bg-blue-500 text-3xl text-white shadow-md"
-          initial={{ opacity: 1, scale: 1 }}
-          animate={{ opacity: 0, scale: 1.5, y: -30 }}  // Animar el "+1" hacia arriba
-          transition={{ duration: 1 }}
-          style={{ top: '20px', right: '20px' }}
-        >
-          +1
-        </motion.div>
-      ))}
     </motion.div>
   );
 };

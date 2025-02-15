@@ -17,7 +17,7 @@ const Home = () => {
 
   const products = [
     {
-      id: 1,
+      identifier: "MTL-relog1",
       name: "Apple Watch Series 7 GPS, Aluminium Case, Starlight Sport",
       image: "https://flowbite.com/docs/images/products/apple-watch.png",
       rating: 4,
@@ -25,7 +25,7 @@ const Home = () => {
       quantity: 1
     },
     {
-      id: 2,
+      identifier: "MTL-relog2",
       name: "Samsung Galaxy Watch 4",
       image: "https://images.samsung.com/latin/galaxy-watch4-classic/feature/galaxy-watch4-classic-silver-better-sleep.png",
       rating: 5,

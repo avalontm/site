@@ -17,3 +17,16 @@
 .rotate-y-180 {
   transform: rotateY(180deg);
 }
+
+@keyframes scrollText {
+  0% {
+    transform: translateX(0); /* Inicia desde la posición original */
+  }
+  100% {
+    transform: translateX(-100%); /* Desplaza el texto fuera de la vista */
+  }
+}
+
+.animate-scrollText {
+  animation: scrollText 10s linear forwards; /* La animación no es infinita, se detiene al finalizar */
+}

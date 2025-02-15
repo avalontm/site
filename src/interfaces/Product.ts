@@ -1,6 +1,6 @@
-// src/interfacces/Product.ts
+// src/interfaces/Product.ts
 export interface Product {
-  id: number;
+  identifier: string; 
   name: string;
   image: string;
   price: number;
