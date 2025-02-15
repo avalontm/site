@@ -1,8 +1,10 @@
+// src/pages/Home.tsx
 import Carousel from "../components/Carousel";
 import Skeleton from "../components/Skeleton";
 import SkeletonImage from "../components/SkeletonImage";
 import VideoPlayer from "../components/Video";
 import ProductCard from "../components/ProductCard";
+import CustomerReviews from "../components/CustomerReviews";
 
 const Home = () => {
   const images = [
@@ -59,6 +61,9 @@ const Home = () => {
 
         {/* Video de ejemplo */}
         <VideoPlayer videoUrl="https://www.youtube.com/watch?v=zTgQ_VnrP_s" className="mt-6 w-80" />
+
+        {/* Otros elementos de la página */}
+        <CustomerReviews />
     </div>
   );
 };

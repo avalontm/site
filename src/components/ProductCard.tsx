@@ -27,7 +27,11 @@ const ProductCard = ({ product }: { product: Product }) => {
   };
 
   return (
-    <div className="relative flex size-full max-w-sm flex-col justify-between rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
+    <motion.div
+      whileHover={{ scale: 1.05, rotate: 1 }}
+      whileTap={{ scale: 0.95 }}
+      className="relative flex size-full max-w-sm flex-col justify-between rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+    >
       <Link to={`/product/${product.id}`}>
         <img
           className="h-[320px] w-full rounded-t-lg object-contain object-center p-8"
@@ -62,7 +66,7 @@ const ProductCard = ({ product }: { product: Product }) => {
           +1
         </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 };
 
