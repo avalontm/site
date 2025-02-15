@@ -3,7 +3,7 @@ import { FaTrashAlt } from 'react-icons/fa'; // Importa el ícono de papelera
 import { useCart } from '../CartContext'; // Importa el hook personalizado
 
 const Carrito: React.FC = () => {
-  const { cart, addToCart, updateQuantity, removeFromCart, clearCart } = useCart(); // Accede a las funciones y carrito
+  const { cart, updateQuantity, removeFromCart } = useCart(); // Accede a las funciones y carrito
 
   // Calcular el precio total con una verificación para evitar NaN
   const total = cart.reduce((sum, producto) => {

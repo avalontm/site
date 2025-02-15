@@ -4,8 +4,8 @@ import { Product } from './interfaces/Product';  // Asegúrate de que 'Product' 
 interface CartContextType {
   cart: Product[];
   addToCart: (product: Product) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
-  removeFromCart: (productId: number) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
+  removeFromCart: (productId: string) => void;
   clearCart: () => void;
 }
 
