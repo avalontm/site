@@ -13,7 +13,7 @@ const employees: Employee[] = [
     github: "https://github.com/avalontm",
   },
   {
-    name: "Arroyo Dominguez Scarleth Yocelet",
+    name: "Arroyo Dominguez Scarleth Yoceleth",
     role: "Software Engineer",
     photo: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
     bio: "Desarrolladora de software con experiencia en JavaScript y Python.",

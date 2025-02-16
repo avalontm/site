@@ -11,6 +11,7 @@ const ModalRegistro: React.FC<ModalRegistroProps> = ({ isOpen, onClose }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [email, setEmail] = useState('');
   const [name, setName] = useState(''); 
+  const [last_name, setLastName] = useState(''); 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -26,8 +27,10 @@ const ModalRegistro: React.FC<ModalRegistroProps> = ({ isOpen, onClose }) => {
     useEffect(() => {
       if (!isOpen) {
         setName('');
+        setLastName('');
         setEmail('');
         setPassword('');
+        setConfirmPassword('');
         setErrorMessage('');
         setSuccessMessage('');
       }
@@ -47,8 +50,10 @@ const ModalRegistro: React.FC<ModalRegistroProps> = ({ isOpen, onClose }) => {
         const timer = setTimeout(() => {
           setIsVisible(false);
           setName('');
+          setLastName('');
           setEmail('');
           setPassword('');
+          setConfirmPassword('');
           setErrorMessage('');
           setSuccessMessage('');
         }, 250); // Tiempo de la animación de salida
@@ -73,8 +78,9 @@ const ModalRegistro: React.FC<ModalRegistroProps> = ({ isOpen, onClose }) => {
 
     const userData = {
       email,
-      name, 
       password,
+      name, 
+      last_name
     };
 
     setErrorMessage('');
@@ -104,6 +110,7 @@ const ModalRegistro: React.FC<ModalRegistroProps> = ({ isOpen, onClose }) => {
           navigate('/'); // Redirigir al inicio
           setEmail('');
           setName('');
+          setLastName('');
           setPassword('');
           setConfirmPassword('');
           setSuccessMessage('');
@@ -173,6 +180,20 @@ const renderSpinner = () => (
                   required
                   disabled={isSubmitting}
                   ref={emailInputRef} // Asignar la referencia al input
+                  className="mt-1 block w-full rounded-md border border-gray-300 p-2"
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="apellido" className="block text-sm font-medium text-gray-700">
+                  Apellido
+                </label>
+                <input
+                  type="text"
+                  id="last_name"
+                  value={last_name}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                  disabled={isSubmitting}
                   className="mt-1 block w-full rounded-md border border-gray-300 p-2"
                 />
               </div>

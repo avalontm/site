@@ -15,26 +15,6 @@ const Home = () => {
     "https://flowbite.com/docs/images/carousel/carousel-5.svg",
   ];
 
-  const products = [
-    {
-      identifier: "MTL-relog1",
-      name: "Apple Watch Series 7 GPS, Aluminium Case, Starlight Sport",
-      image: "https://flowbite.com/docs/images/products/apple-watch.png",
-      rating: 4,
-      price: 599,
-      quantity: 1
-    },
-    {
-      identifier: "MTL-relog2",
-      name: "Samsung Galaxy Watch 4",
-      image: "https://images.samsung.com/latin/galaxy-watch4-classic/feature/galaxy-watch4-classic-silver-better-sleep.png",
-      rating: 5,
-      price: 299,
-      quantity: 1
-    },
-    // Puedes agregar más productos aquí
-  ];
-
   return (
     <div className="flex flex-col items-center justify-center gap-6 p-4 sm:p-8 lg:p-16">
         {/* Título y botón de cambio de tema */}
@@ -42,13 +22,6 @@ const Home = () => {
 
         {/* Carrusel de imágenes */}
         <Carousel images={images} />
-
-        {/* Grilla de productos */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
 
         {/* Sección de skeletons */}
         <div className="mt-6 flex flex-col items-center justify-center">

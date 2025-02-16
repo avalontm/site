@@ -10,6 +10,8 @@ interface ProductCarousel3DProps {
   images: string[];
 }
 
+const defaultImage = "/assets/default-product.png"; // Imagen por defecto
+
 const ProductCarousel3D: React.FC<ProductCarousel3DProps> = ({ images }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null); // Referencia al modal para detectar clics fuera de él
@@ -43,7 +45,7 @@ const ProductCarousel3D: React.FC<ProductCarousel3DProps> = ({ images }) => {
         {images.map((image, index) => (
           <SwiperSlide key={index} className="size-60">
             <img
-              src={image}
+              src={image || defaultImage}
               alt={`Product ${index + 1}`}
               className="size-full cursor-pointer rounded-xl object-cover shadow-lg"
               onClick={() => setSelectedImage(image)} // Click para abrir el modal

@@ -10,12 +10,14 @@ import NotFound from "./pages/NotFound";
 import { useAuth } from "./AuthContext";
 import CarritoButton from "./components/CarritoButton";
 import { CartProvider } from "./CartContext";
-import { ToastContainer } from "react-toastify";  // Importar el ToastContainer
+import { ToastContainer } from "react-toastify"; 
 
 // Carga diferida (lazy loading)
 const Perfil = lazy(() => import("./pages/Perfil"));
 const Cart = lazy(() => import("./pages/Carrito"));
 const AdminPanel = lazy(() => import("./admins/AdminPanel"));
+const Products = lazy(() => import("./pages/Products"));
+const LoadProducts = lazy(() => import("./pages/Products")); // Nueva página de carga de productos
 
 const ProtectedRoute = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -41,8 +43,18 @@ function App() {
             <Routes>
               {/* Rutas de la aplicación */}
               <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/nosotros" element={<About />} />
+              <Route path="/producto/:productId" element={<ProductDetail />} />
+
+              {/* Nueva ruta para la carga de productos */}
+              <Route
+                path="/productos"
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <LoadProducts />
+                  </Suspense>
+                }
+              />
 
               {/* Rutas protegidas para usuarios autenticados */}
               <Route element={<ProtectedRoute />}>
@@ -86,12 +98,12 @@ function App() {
 
           {/* Contenedor de Toasts */}
           <ToastContainer 
-            position="top-right"       // Posición de los toasts
-            autoClose={3000}           // Tiempo que permanece visible (en milisegundos)
-            hideProgressBar={false}    // Mostrar barra de progreso
-            newestOnTop={true}         // Los toasts más recientes aparecen arriba
-            closeOnClick={true}        // Cerrar al hacer clic en el toast
-            pauseOnHover={true}        // Pausar el toast cuando se pasa el cursor sobre él
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={true}
+            closeOnClick={true}
+            pauseOnHover={true}
           />
         </div>
       </BrowserRouter>

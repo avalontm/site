@@ -5,6 +5,8 @@ import { useCart } from '../CartContext'; // Importa el hook useCart
 import { Product } from '../interfaces/Product';  // Importar la interfaz Product
 import { toast } from 'react-toastify'; // Importa el toast
 
+const defaultImage = "/assets/default-product.png"; // Imagen por defecto
+
 const ProductCard = ({ product }: { product: Product }) => {
   const { addToCart } = useCart(); // Usamos el contexto del carrito
   const nameRef = useRef<HTMLHeadingElement | null>(null);
@@ -16,19 +18,22 @@ const ProductCard = ({ product }: { product: Product }) => {
     if (nameRef.current) {
       setIsLongName(nameRef.current.scrollWidth > nameRef.current.clientWidth);
     }
-  }, [product.name]);
+  }, [product.nombre]);
 
   const handleAddToCart = () => {
     addToCart({
       identifier: product.identifier,
-      name: product.name,
-      image: product.image,
-      price: product.price,
-      quantity: 1,
+      fecha_creacion: product.fecha_creacion,
+      nombre: product.nombre,
+      descripcion: product.descripcion,
+      imagen: product.imagen,
+      precio: product.precio,
+      cantidad: 1,
+      no_disponible: product.no_disponible
     }); // Agregamos el producto al carrito
 
     // Mostrar mensaje de éxito usando toast
-    toast.success(`${product.name} ha sido agregado al carrito`, {
+    toast.success(`${product.nombre} ha sido agregado al carrito`, {
       position: "top-right", // Posición del toast
       autoClose: 3000, // Tiempo que permanece visible (en milisegundos)
       hideProgressBar: false, // Mostrar barra de progreso
@@ -49,11 +54,12 @@ const ProductCard = ({ product }: { product: Product }) => {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <Link to={`/product/${product.identifier}`} className="w-full">
+      <Link to={`/producto/${product.identifier}`} className="w-full">
         <img
-          className="h-64 w-full object-contain object-center"
-          src={product.image}
-          alt={product.name}
+          className="mt-4 h-64 w-full overflow-hidden rounded-lg object-contain object-center" // Se agregó overflow-hidden
+          src={product.imagen || defaultImage} // Imagen del producto o la de respaldo
+          alt={product.nombre}
+          onError={(e) => (e.currentTarget.src = defaultImage)} // Si hay error, cambia a la imagen por defecto
         />
       </Link>
       <div className="flex flex-col p-4">
@@ -70,11 +76,11 @@ const ProductCard = ({ product }: { product: Product }) => {
             paddingRight: isHovered && isLongName ? '10px' : '0px', // Agregar padding a la derecha solo cuando se anime
           }}
         >
-          {product.name}
+          {product.nombre}
         </h5>
 
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-xl font-bold text-gray-900 dark:text-white">${product.price.toFixed(2)}</span>
+          <span className="text-xl font-bold text-gray-900 dark:text-white">${product.precio.toFixed(2)}</span>
 
           {/* Botón con animación */}
           <button

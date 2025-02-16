@@ -31,7 +31,7 @@ export const CartProvider: React.FC = ({ children }) => {
       if (existingProductIndex !== -1) {
         // Si el producto ya existe en el carrito, incrementamos su cantidad
         const updatedCart = [...prevCart];
-        updatedCart[existingProductIndex].quantity += 1;
+        updatedCart[existingProductIndex].cantidad += 1;
         return updatedCart;
       } else {
         // Si el producto no existe, lo añadimos al carrito
@@ -41,13 +41,13 @@ export const CartProvider: React.FC = ({ children }) => {
   };
 
    // Función para actualizar la cantidad de un producto
-   const updateQuantity = (productId: string, quantity: number) => {
-    if (quantity <= 0) {
+   const updateQuantity = (productId: string, cantidad: number) => {
+    if (cantidad <= 0) {
       removeFromCart(productId);  // Si la cantidad es 0 o menos, eliminamos el producto
     } else {
       setCart((prevCart) => {
         const updatedCart = prevCart.map((item) =>
-          item.identifier === productId ? { ...item, quantity } : item
+          item.identifier === productId ? { ...item, cantidad } : item
         );
         return updatedCart;
       });

@@ -48,7 +48,7 @@ const Navbar: React.FC = () => {
           
           <div className="flex space-x-6">
             <Link to="/productos" className="text-gray-800 hover:text-blue-600 dark:text-white dark:hover:text-blue-400">Productos</Link>
-            <Link to="/about" className="text-gray-800 hover:text-blue-600 dark:text-white dark:hover:text-blue-400">Nosotros</Link>
+            <Link to="/nosotros" className="text-gray-800 hover:text-blue-600 dark:text-white dark:hover:text-blue-400">Nosotros</Link>
           </div>
           
           <div className="flex items-center space-x-1 md:order-2 md:space-x-2 rtl:space-x-reverse">
