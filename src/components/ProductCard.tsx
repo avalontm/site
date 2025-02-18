@@ -54,7 +54,7 @@ const ProductCard = ({ product }: { product: Product }) => {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <Link to={`/producto/${product.identifier}`} className="w-full">
+      <Link to={`/producto/${product.uuid}`} className="w-full">
         <img
           className="mt-4 h-64 w-full overflow-hidden rounded-lg object-contain object-center" // Se agregó overflow-hidden
           src={product.imagen || defaultImage} // Imagen del producto o la de respaldo
@@ -81,14 +81,6 @@ const ProductCard = ({ product }: { product: Product }) => {
 
         <div className="mt-4 flex items-center justify-between">
           <span className="text-xl font-bold text-gray-900 dark:text-white">${product.precio.toFixed(2)}</span>
-
-          {/* Botón con animación */}
-          <button
-            className="mt-3 rounded-lg bg-blue-700 px-6 py-2 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            onClick={handleAddToCart}
-          >
-            Agregar al carrito
-          </button>
         </div>
       </div>
     </motion.div>

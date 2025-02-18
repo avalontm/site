@@ -1,6 +1,6 @@
 // src/interfaces/Product.ts
 export interface Product {
-  identifier: string; 
+  uuid: string; 
   fecha_creacion: Date;
   nombre: string;
   descripcion: string;

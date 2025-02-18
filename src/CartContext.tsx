@@ -26,7 +26,7 @@ export const CartProvider: React.FC = ({ children }) => {
   // Función para agregar un producto al carrito
   const addToCart = (product: Product) => {
     setCart((prevCart) => {
-      const existingProductIndex = prevCart.findIndex((item) => item.identifier === product.identifier);
+      const existingProductIndex = prevCart.findIndex((item) => item.uuid === product.uuid);
 
       if (existingProductIndex !== -1) {
         // Si el producto ya existe en el carrito, incrementamos su cantidad
@@ -47,7 +47,7 @@ export const CartProvider: React.FC = ({ children }) => {
     } else {
       setCart((prevCart) => {
         const updatedCart = prevCart.map((item) =>
-          item.identifier === productId ? { ...item, cantidad } : item
+          item.uuid === productId ? { ...item, cantidad } : item
         );
         return updatedCart;
       });
@@ -56,7 +56,7 @@ export const CartProvider: React.FC = ({ children }) => {
 
   // Función para eliminar un producto del carrito
   const removeFromCart = (productId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.identifier !== productId));
+    setCart((prevCart) => prevCart.filter((item) => item.uuid !== productId));
   };
 
   // Función para limpiar el carrito

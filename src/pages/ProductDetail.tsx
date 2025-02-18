@@ -40,7 +40,7 @@ const ProductDetail = () => {
     if (!product) return;
 
     addToCart({
-      identifier: product.identifier,
+      uuid: product.uuid,
       fecha_creacion: product.fecha_creacion,
       nombre: product.nombre,
       descripcion: product.descripcion,
