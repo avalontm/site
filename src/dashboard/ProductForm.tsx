@@ -66,10 +66,12 @@ const ProductoForm = () => {
       });
       const data = await response.json();
       setProducto(data); 
-      setLoading(false);
+      
     } catch (error) {
       setError("Error al cargar el producto.");
-      setLoading(false);
+    }finally
+    {
+        setLoading(false);
     }
   };
   
