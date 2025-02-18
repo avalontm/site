@@ -10,14 +10,15 @@ import NotFound from "./pages/NotFound";
 import { useAuth } from "./AuthContext";
 import CarritoButton from "./components/CarritoButton";
 import { CartProvider } from "./CartContext";
-import { ToastContainer } from "react-toastify"; 
+import { ToastContainer } from "react-toastify";
 
 // Carga diferida (lazy loading)
 const Perfil = lazy(() => import("./pages/Perfil"));
 const Cart = lazy(() => import("./pages/Carrito"));
 const AdminPanel = lazy(() => import("./dashboard/AdminPanel"));
+const ProductosPanel = lazy(() => import("./dashboard/ProductosPanel"));
 const Products = lazy(() => import("./pages/Products"));
-const LoadProducts = lazy(() => import("./pages/Products")); // Nueva página de carga de productos
+const ProductoForm = lazy(() => import("./dashboard/ProductForm"));
 
 const ProtectedRoute = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -44,14 +45,23 @@ function App() {
               {/* Rutas de la aplicación */}
               <Route path="/" element={<Home />} />
               <Route path="/nosotros" element={<About />} />
-              <Route path="/producto/:productId" element={<ProductDetail />} />
 
-              {/* Nueva ruta para la carga de productos */}
+              {/* Ruta para productos */}
               <Route
                 path="/productos"
                 element={
                   <Suspense fallback={<Loading />}>
-                    <LoadProducts />
+                    <Products />
+                  </Suspense>
+                }
+              />
+
+              {/* Ruta para detalles de producto */}
+              <Route
+                path="/producto/:uuid"
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <ProductDetail />
                   </Suspense>
                 }
               />
@@ -86,14 +96,23 @@ function App() {
                     </Suspense>
                   }
                 />
-                 <Route
+                <Route
                   path="/dashboard/productos"
                   element={
                     <Suspense fallback={<Loading />}>
-                      <AdminPanel />
+                      <ProductosPanel />
                     </Suspense>
                   }
                 />
+                <Route
+                  path="/dashboard/producto/:uuid?"
+                  element={
+                    <Suspense fallback={<Loading />}>
+                      <ProductoForm />
+                    </Suspense>
+                  }
+                />
+
               </Route>
 
               {/* Página 404 */}
@@ -105,7 +124,7 @@ function App() {
           <CarritoButton />
 
           {/* Contenedor de Toasts */}
-          <ToastContainer 
+          <ToastContainer
             position="top-right"
             autoClose={3000}
             hideProgressBar={false}

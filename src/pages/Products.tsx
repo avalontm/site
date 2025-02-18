@@ -36,7 +36,7 @@ const Products = () => {
       </h1>
 
       {loading ? (
-        // 👇 Sección de carga con "skeletons"
+        //  Sección de carga con "skeletons"
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, index) => (
             <SkeletonImage key={index} />
@@ -48,7 +48,7 @@ const Products = () => {
         </p>
       ) : (
 
-        // 👇 Lista real de productos cuando ya están cargados
+        //  Lista real de productos cuando ya están cargados
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {products.map((product) => (
             <motion.div

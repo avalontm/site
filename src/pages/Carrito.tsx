@@ -2,6 +2,8 @@ import React from 'react';
 import { FaTrashAlt } from 'react-icons/fa'; // Importa el ícono de papelera
 import { useCart } from '../CartContext'; // Importa el hook personalizado
 
+const defaultImage = "/assets/default-product.png"; // Imagen por defecto
+
 const Carrito: React.FC = () => {
   const { cart, updateQuantity, removeFromCart } = useCart(); // Accede a las funciones y carrito
 
@@ -29,7 +31,7 @@ const Carrito: React.FC = () => {
                 {/* Contenedor para el nombre y la imagen alineados a la izquierda */}
                 <div className="flex flex-1 items-center space-x-8">
                   <img
-                    src={producto.imagen}
+                    src={producto.imagen || defaultImage}
                     alt={producto.nombre}
                     className="size-16 rounded-md object-cover"
                   />
@@ -49,7 +51,7 @@ const Carrito: React.FC = () => {
                       -
                     </button>
                     
-                    <span className="text-gray-700 dark:text-gray-300">{producto.uuid}</span>
+                    <span className="text-gray-700 dark:text-gray-300">{producto.cantidad}</span>
 
                     <button
                       className="rounded-full p-1 text-gray-600 hover:bg-gray-300 dark:text-gray-400 dark:hover:bg-gray-600"

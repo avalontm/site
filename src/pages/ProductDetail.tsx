@@ -10,7 +10,7 @@ import { Product } from "../interfaces/Product";
 import Loading from "../components/Loading";
 
 const ProductDetail = () => {
-  const { productId } = useParams<{ productId: string }>();
+  const { uuid } = useParams<{ uuid: string }>();
   const { addToCart } = useCart();
 
   const [product, setProduct] = useState<Product>(null);
@@ -20,7 +20,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`${config.apiUrl}/product/${productId}`);
+        const response = await fetch(`${config.apiUrl}/product/${uuid}`);
         if (!response.ok) {
           throw new Error("Producto no encontrado");
         }
@@ -34,7 +34,7 @@ const ProductDetail = () => {
     };
 
     fetchProduct();
-  }, [productId]);
+  }, [uuid]);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -42,12 +42,15 @@ const ProductDetail = () => {
     addToCart({
       uuid: product.uuid,
       fecha_creacion: product.fecha_creacion,
+      categoria_uuid: product.categoria_uuid,
       nombre: product.nombre,
       descripcion: product.descripcion,
       imagen: product.imagen,
+      precio_unitario: product.precio_unitario,
       precio: product.precio,
       cantidad: 1,
       no_disponible: product.no_disponible,
+      
     });
 
     toast.success(`${product.nombre} ha sido agregado al carrito`, {
