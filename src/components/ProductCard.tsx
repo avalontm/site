@@ -1,14 +1,11 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
-import { useCart } from '../CartContext'; // Importa el hook useCart
 import { Product } from '../interfaces/Product';  // Importar la interfaz Product
-import { toast } from 'react-toastify'; // Importa el toast
 
 const defaultImage = "/assets/default-product.png"; // Imagen por defecto
 
 const ProductCard = ({ product }: { product: Product }) => {
-  const { addToCart } = useCart(); // Usamos el contexto del carrito
   const nameRef = useRef<HTMLHeadingElement | null>(null);
   const [isLongName, setIsLongName] = useState(false);
   const [isHovered, setIsHovered] = useState(false); // Para saber si la tarjeta está siendo "hovered"
@@ -19,28 +16,6 @@ const ProductCard = ({ product }: { product: Product }) => {
       setIsLongName(nameRef.current.scrollWidth > nameRef.current.clientWidth);
     }
   }, [product.nombre]);
-
-  const handleAddToCart = () => {
-    addToCart({
-      identifier: product.identifier,
-      fecha_creacion: product.fecha_creacion,
-      nombre: product.nombre,
-      descripcion: product.descripcion,
-      imagen: product.imagen,
-      precio: product.precio,
-      cantidad: 1,
-      no_disponible: product.no_disponible
-    }); // Agregamos el producto al carrito
-
-    // Mostrar mensaje de éxito usando toast
-    toast.success(`${product.nombre} ha sido agregado al carrito`, {
-      position: "top-right", // Posición del toast
-      autoClose: 3000, // Tiempo que permanece visible (en milisegundos)
-      hideProgressBar: false, // Mostrar barra de progreso
-      closeOnClick: true, // Cerrar el toast al hacer clic
-      pauseOnHover: true, // Pausar al hacer hover
-    });
-  };
 
   // Controlar animación solo cuando el mouse está encima de la tarjeta
   const handleMouseEnter = () => setIsHovered(true);

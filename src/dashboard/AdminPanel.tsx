@@ -1,15 +1,5 @@
 //src/admins/AdminPanel.tsx
-import { useAuth } from "../AuthContext"; 
-import { useNavigate } from "react-router-dom";
-
 const AdminPanel = () => {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/"); // Redirige al inicio después de cerrar sesión
-  };
 
   return (
     <div className="flex w-full flex-col items-center justify-center bg-gray-900 p-8 text-white">

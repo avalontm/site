@@ -110,7 +110,7 @@ const Navbar: React.FC = () => {
                       </li>
                       {role === 'admin' && (
                         <li>
-                          <Link to="/admin" onClick={closeMenu} className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                          <Link to="/dashboard" onClick={closeMenu} className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                             Panel Administración
                           </Link>
                         </li>

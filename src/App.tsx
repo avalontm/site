@@ -15,7 +15,7 @@ import { ToastContainer } from "react-toastify";
 // Carga diferida (lazy loading)
 const Perfil = lazy(() => import("./pages/Perfil"));
 const Cart = lazy(() => import("./pages/Carrito"));
-const AdminPanel = lazy(() => import("./admins/AdminPanel"));
+const AdminPanel = lazy(() => import("./dashboard/AdminPanel"));
 const Products = lazy(() => import("./pages/Products"));
 const LoadProducts = lazy(() => import("./pages/Products")); // Nueva página de carga de productos
 
@@ -79,7 +79,15 @@ function App() {
               {/* Rutas protegidas solo para administradores */}
               <Route element={<AdminRoute />}>
                 <Route
-                  path="/admin"
+                  path="/dashboard"
+                  element={
+                    <Suspense fallback={<Loading />}>
+                      <AdminPanel />
+                    </Suspense>
+                  }
+                />
+                 <Route
+                  path="/dashboard/productos"
                   element={
                     <Suspense fallback={<Loading />}>
                       <AdminPanel />
