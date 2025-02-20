@@ -38,8 +38,9 @@ function App() {
   return (
     <CartProvider>
       <BrowserRouter basename="">
-        <div className="flex min-h-screen flex-col dark:bg-gray-800">
-          <Navbar />
+      <Navbar />
+        <div className="flex flex-col">
+         
           <main className="flex flex-col items-center justify-center gap-6 p-4 sm:p-8 lg:p-16">
             <Routes>
               {/* Rutas de la aplicación */}

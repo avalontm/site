@@ -87,7 +87,7 @@ const ModalRegistro: React.FC<ModalRegistroProps> = ({ isOpen, onClose }) => {
     setSuccessMessage('');
 
     try {
-      const response = await fetch(`${config.apiUrl}/user/register`, {
+      const response = await fetch(`${config.apiUrl}/usuario/registrar`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

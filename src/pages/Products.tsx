@@ -13,7 +13,7 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(`${config.apiUrl}/product/listar`);
+        const response = await fetch(`${config.apiUrl}/producto/listar`);
         if (!response.ok) {
           throw new Error("Error al obtener los productos");
         }

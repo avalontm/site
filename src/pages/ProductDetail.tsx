@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useCart } from "../CartContext";
+import { useAuth } from "../AuthContext";  // Asegúrate de importar el contexto de autenticación
 import { Helmet } from "react-helmet-async";
 import ProductCarousel3D from "../components/ProductCarousel3D";
 import { toast } from "react-toastify";
@@ -12,6 +13,7 @@ import Loading from "../components/Loading";
 const ProductDetail = () => {
   const { uuid } = useParams<{ uuid: string }>();
   const { addToCart } = useCart();
+  const { role } = useAuth();  // Obtener el rol del usuario desde el contexto
 
   const [product, setProduct] = useState<Product>(null);
   const [loading, setLoading] = useState(true);
@@ -20,7 +22,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`${config.apiUrl}/product/${uuid}`);
+        const response = await fetch(`${config.apiUrl}/producto/${uuid}`);
         if (!response.ok) {
           throw new Error("Producto no encontrado");
         }
@@ -43,6 +45,8 @@ const ProductDetail = () => {
       uuid: product.uuid,
       fecha_creacion: product.fecha_creacion,
       categoria_uuid: product.categoria_uuid,
+      inversionista_uuid: product.inversionista_uuid,
+      sku: product.sku,
       nombre: product.nombre,
       descripcion: product.descripcion,
       imagen: product.imagen,
@@ -50,7 +54,6 @@ const ProductDetail = () => {
       precio: product.precio,
       cantidad: 1,
       no_disponible: product.no_disponible,
-      
     });
 
     toast.success(`${product.nombre} ha sido agregado al carrito`, {
@@ -99,17 +102,20 @@ const ProductDetail = () => {
         {/* 🌀 Carrusel 3D */}
         <div className="mb-8 flex justify-center md:w-1/2">
           <ProductCarousel3D
-            images={Array.isArray(product.imagen) ? product.imagen : [product?.imagen]}
+            images={Array.isArray(product?.imagen) ? product?.imagen : [product.imagen]}
           />
         </div>
 
         {/* Información del Producto */}
         <div className="w-full md:w-1/2">
           <h2 className="text-3xl font-semibold text-gray-900 dark:text-white">{product?.nombre}</h2>
-          <p className="mt-2 text-lg text-gray-700 dark:text-gray-300">{product?.descripcion}</p>
+          <p
+            className="mt-2 text-lg text-gray-700 dark:text-gray-300"
+            dangerouslySetInnerHTML={{ __html: String(product?.descripcion || "") }}
+          ></p>
 
           <div className="mt-4 flex items-center">
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">${product?.precio.toFixed(2)}</span>
+            <span className="text-2xl font-bold text-gray-900 dark:text-white">${product?.precio?.toFixed(2)}</span>
           </div>
 
           {/* Valoraciones del producto */}
@@ -128,13 +134,25 @@ const ProductDetail = () => {
 
           <div className="mt-6">
             <button
-              className="w-full rounded-lg bg-blue-600 py-3 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 disabled:cursor-not-allowed disabled:opacity-50"
+              className="bg-cart w-full rounded-lg py-3 text-lg font-semibold text-white shadow-lg transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
               onClick={handleAddToCart}
               disabled={product.cantidad <= 0}
             >
               {product.cantidad > 0 ? "Agregar al carrito" : "Agotado"}
             </button>
           </div>
+
+          {/* Botón de edición solo si es administrador */}
+          {role === "admin" && (
+            <div className="mt-6">
+              <a
+                href={`/dashboard/producto/${product.uuid}`}
+                className="w-full rounded-lg bg-black px-6 py-3 text-white hover:bg-gray-800"
+              >
+                Editar Producto
+              </a>
+            </div>
+          )}
 
           {/* Opciones de envío */}
           <div className="mt-6 text-sm text-gray-500 dark:text-gray-400">

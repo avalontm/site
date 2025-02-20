@@ -24,7 +24,7 @@ const ProductosPanel = () => {
     
     try {
       const response = await fetch(
-        `${config.apiUrl}/product/dashboard/pagina?page=${pagina}&categoria=${categoriaSeleccionada}`,
+        `${config.apiUrl}/producto/panel/pagina?page=${pagina}&categoria=${categoriaSeleccionada}`,
         {
           method: "GET",
           headers: {
@@ -49,7 +49,7 @@ const ProductosPanel = () => {
     if (!token) return console.error("No se encontró el token de autenticación.");
     
     try {
-      const response = await fetch(`${config.apiUrl}/category/listar`, {
+      const response = await fetch(`${config.apiUrl}/categoria/listar`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -75,6 +75,7 @@ const ProductosPanel = () => {
     }
   }, [pagina, categoriaSeleccionada, categoriasCargadas]);
 
+  
   const cambiarPagina = (pagina: number) => {
     if (pagina >= 1 && pagina <= totalPaginas) {
       setPagina(pagina);
@@ -160,8 +161,8 @@ const ProductosPanel = () => {
             <table className="min-w-full text-left text-sm text-gray-400">
               <thead className="bg-gray-700">
                 <tr>
+                  <th className="px-6 py-3">Imagen</th>
                   <th className="px-6 py-3">Nombre</th>
-                  <th className="px-6 py-3">Descripción</th>
                   <th className="px-6 py-3">Precio</th>
                   <th className="px-6 py-3">Cantidad</th>
                   <th className="px-6 py-3">Acciones</th>
@@ -170,8 +171,25 @@ const ProductosPanel = () => {
               <tbody>
                 {productos.map((producto) => (
                   <tr key={producto.uuid} className="border-b border-gray-700">
-                    <td className="px-6 py-4">{producto.nombre}</td>
-                    <td className="px-6 py-4">{producto.descripcion}</td>
+                    <td className="px-6 py-4">
+                      {/* Verifica si la imagen está presente y muestra la imagen con un tamaño adecuado */}
+                      {producto.imagen ? (
+                        <a href={`/producto/${producto.uuid}`} target="_blank" rel="noopener noreferrer">
+                        <img
+                          src={producto.imagen}  // Asegúrate de que el campo 'imagen' tenga la URL correcta
+                          alt={producto.nombre}
+                          className="size-16 rounded object-cover"
+                        />
+                        </a>
+                      ) : (
+                        <span>No disponible</span>  // Si no hay imagen, muestra un mensaje alternativo
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                     <a href={`/producto/${producto.uuid}`} target="_blank" rel="noopener noreferrer">
+                        {producto.nombre}
+                      </a>
+                    </td>
                     <td className="px-6 py-4">${producto.precio}</td>
                     <td className="px-6 py-4">{producto.cantidad}</td>
                     <td className="px-6 py-4">
@@ -195,6 +213,7 @@ const ProductosPanel = () => {
               </tbody>
             </table>
           </div>
+
 
           {/* Paginación */}
           <div className="mt-6 flex justify-center">

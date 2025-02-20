@@ -86,7 +86,7 @@ const Carrito: React.FC = () => {
       </div>
 
       <button
-        className="mt-6 w-full rounded-md bg-blue-600 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-700"
+        className="bg-cart mt-6 w-full rounded-md py-2 focus:outline-none focus:ring-4 "
         onClick={() => alert('Procediendo al pago')}
       >
         Proceder con la compra

@@ -1,6 +1,47 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #eeceb6
+}
+
+/* ESTILO DE COLORES PARA LA PAGINA*/
+
+
+.bg{
+  background-color: #eeceb6;
+}
+
+.bg-nav {
+  background-color: #3f5064;
+  border-bottom: 1px solid #2c3e50;
+}
+
+.bg-cart
+{
+  color: white;
+  background-color: #f86d07;
+}
+
+.bg-login {
+  color: white;
+  background-color: #f86d07;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.bg-login:hover {
+  background-color: #d95d06; /* Un tono más oscuro al pasar el mouse */
+  transform: scale(1.05); /* Efecto de crecimiento ligero */
+}
+
+.bg-login:focus {
+  background-color: #bf5205; /* Un tono más oscuro al enfocarse */
+  outline: 2px solid #ff8c42; /* Borde resaltado para accesibilidad */
+  transform: scale(1.05);
+}
 
 .perspective {
   perspective: 1000px;
@@ -29,4 +70,9 @@
 
 .animate-scrollText {
   animation: scrollText 10s linear forwards; /* La animación no es infinita, se detiene al finalizar */
+}
+
+.ql-toolbar {
+  background-color: #ffff; /* Color de la barra de herramientas */
+  border-radius: 8px;
 }

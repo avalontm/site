@@ -22,11 +22,15 @@ const Home = () => {
   };
   
   return (
-    <div className="flex flex-col items-center justify-center gap-6 p-4 sm:p-8 lg:p-16">
+    <div className="flex flex-col items-center justify-center">
+
+       {/* Carrusel de imágenes */}
+       <Carousel images={images} />
+       
         {/* Título y botón de cambio de tema */}
         <SplitText
           text="Hola, Bienvenido a Moshi moshi Ensenada"
-          className="text-center text-2xl font-semibold text-gray-800 dark:text-white"
+          className="text-center text-2xl font-semibold text-gray-800"
           delay={150}
           animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
           animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
@@ -48,8 +52,7 @@ const Home = () => {
         rotationInterval={2000}
       />
 
-        {/* Carrusel de imágenes */}
-        <Carousel images={images} />
+       
 
         {/* Sección de skeletons */}
         <div className="mt-6 flex flex-col items-center justify-center">

@@ -76,7 +76,7 @@ const ModalLogin: React.FC<ModalLoginProps> = ({ isOpen, onClose }) => {
     setSuccessMessage('');
     
     try {
-      const response = await fetch(`${config.apiUrl}/user/login`, {
+      const response = await fetch(`${config.apiUrl}/usuario/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

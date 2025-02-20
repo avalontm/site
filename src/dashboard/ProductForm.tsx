@@ -4,25 +4,22 @@ import { Product } from "../interfaces/Product";
 import config from "../config";
 import Loading from "../components/Loading";
 import { Category } from "../interfaces/Category";
+import { Investor } from "../interfaces/Investor";
+import EditorHtml from "../components/EditorHtml";
 
 const ProductoForm = () => {
   const { uuid } = useParams<string>(); // Obtener el uuid de los parámetros de la URL (si existe)
   const navigate = useNavigate(); // Para redirigir después de guardar el producto
-  const [producto, setProducto] = useState<Product>({
-    uuid: "",
-    fecha_creacion: new Date(),
-    categoria_uuid: "",
-    nombre: "",
-    descripcion: "",
-    imagen: "",
-    precio_unitario: 0,
-    precio: 0,
-    cantidad: 1,
-    no_disponible: false,
-  });
+  const [producto, setProducto] = useState<Product>(new Product());
+  
   const [categorias, setCategorias] = useState<Category[]>([]);
+  const [inversionistas, setInversionista] = useState<Investor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loaded, setLoaded]  = useState(false);
+  
+  // Función para hacer una pausa (sleep) de X milisegundos
+  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
   // Función para cargar las categorías
   const cargarCategorias = async () => {
@@ -32,7 +29,7 @@ const ProductoForm = () => {
       return;
     }
     try {
-      const response = await fetch(`${config.apiUrl}/category/listar`, {
+      const response = await fetch(`${config.apiUrl}/categoria/listar`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -46,10 +43,33 @@ const ProductoForm = () => {
     }
   };
 
+    // Función para cargar los inversionistas
+    const cargarInversionistas = async () => {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        console.error("No se encontró el token de autenticación.");
+        return;
+      }
+      try {
+        const response = await fetch(`${config.apiUrl}/inversionista/listar`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        setInversionista(data);
+      } catch (error) {
+        console.error("Error al cargar inversinistas:", error);
+      }
+    };
+
+    
   // Función para cargar el producto (si estamos editando)
   const cargarProducto = async () => {
     if (!uuid) return;
-  
+
     const token = localStorage.getItem("authToken");
     if (!token) {
       console.error("No se encontró el token de autenticación.");
@@ -57,7 +77,7 @@ const ProductoForm = () => {
     }
   
     try {
-      const response = await fetch(`${config.apiUrl}/product/dashboard/${uuid}`, {
+      const response = await fetch(`${config.apiUrl}/producto/panel/${uuid}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +95,6 @@ const ProductoForm = () => {
     }
   };
   
-
   // Función para guardar el producto (crear o actualizar)
   const guardarProducto = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,8 +105,8 @@ const ProductoForm = () => {
     }
  
     const url = (uuid && uuid.trim()) 
-    ? `${config.apiUrl}/product/dashboard/${uuid}` // Si existe un uuid no vacío ni undefined, estamos editando
-    : `${config.apiUrl}/product/dashboard/crear`; // Si no existe un uuid o está vacío, estamos creando
+    ? `${config.apiUrl}/producto/panel/${uuid}` // Si existe un uuid no vacío ni undefined, estamos editando
+    : `${config.apiUrl}/producto/panel/crear`; // Si no existe un uuid o está vacío, estamos creando
 
     const method = (uuid && uuid.trim()) ? "PUT" : "POST"; // PUT para editar, POST para crear
     console.log(JSON.stringify(producto));
@@ -112,32 +131,65 @@ const ProductoForm = () => {
     }
   };
   
-  // Cargar categorías y producto cuando se monta el componente
-  useEffect(() => {
-    if (categorias.length === 0) { // Solo cargar si no se han cargado antes
-      cargarCategorias();
-    }
-    if (uuid) {
-      cargarProducto();
-    } else {
-      // Verificar si las categorías están cargadas
-      if (categorias.length > 0) {
-        setProducto({ ...producto, categoria_uuid: categorias[0].uuid, cantidad: 1 });
+// Cargar categorías y producto cuando se monta el componente
+useEffect(() => {
+  const loadData = async () => {
+    if (!loaded) {
+      setLoaded(true);
+      setLoading(true); // Inicia el loading
+
+      try {
+        // Cargar categorías e inversionistas de manera secuencial
+        if (categorias.length === 0) {
+          await cargarCategorias();
+        }
+
+        if (inversionistas.length === 0) {
+          await cargarInversionistas();
+        }
+
+        // Si hay un uuid, cargar el producto
+        if (uuid) {
+          await cargarProducto();
+        }
+
+      } catch (error) {
+        console.error("Error al cargar los datos:", error);
+      } finally {
+        setLoading(false); // Termina el loading
       }
-      setLoading(false);
+
     }
-  }, [uuid, categorias]);
+  };
+
+  loadData();
+}, [uuid, categorias, inversionistas, loaded]);  // Asegúrate de incluir 'loaded' para evitar llamadas innecesarias
 
 
   useEffect(() => {
+    console.log("categorias: " + categorias.length);
     // Cuando el producto cambia, aseguramos que la categoría también lo haga
-    if (producto.categoria_uuid && categorias.length > 0) {
+    if (categorias.length > 0) {
       setProducto((prevProducto) => ({
         ...prevProducto,
         categoria_uuid: producto.categoria_uuid,
       }));
     }
   }, [producto.categoria_uuid, categorias]);
+
+  useEffect(() => {
+    console.log("inversionistas: " + inversionistas.length);
+    // Cuando el producto cambia, aseguramos que el inversionista también lo haga
+    if ( inversionistas.length > 0) {
+      setProducto({
+        ...producto,
+        categoria_uuid: categorias[0].uuid,
+        inversionista_uuid: inversionistas[0].uuid,
+        cantidad: 1,
+      });
+    }
+
+  }, [producto.inversionista_uuid, inversionistas]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -186,6 +238,19 @@ const ProductoForm = () => {
             </select>
           </div>
           
+           {/* SKU */}
+           <div>
+            <label className="block text-sm font-semibold">SKU</label>
+            <input
+              type="text"
+              name="sku"
+              value={producto.sku}
+              onChange={handleInputChange}
+              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white"
+              required
+            />
+          </div>
+
           {/* Nombre */}
           <div>
             <label className="block text-sm font-semibold">Nombre</label>
@@ -202,17 +267,11 @@ const ProductoForm = () => {
           {/* Descripción */}
           <div>
             <label className="block text-sm font-semibold">Descripción</label>
-            <textarea
-              name="descripcion"
-              value={producto.descripcion}
-              onChange={handleInputChange}
-              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white"
-              required
-            />
+            <EditorHtml name="descripcion" value={producto.descripcion} onChange={handleInputChange} />
           </div>
 
-            {/* Precio */}
-            <div>
+          {/* Precio */}
+          <div>
                 <label className="block text-sm font-semibold">Precio Unitario</label>
                 <input
                 type="number"
@@ -285,6 +344,24 @@ const ProductoForm = () => {
             </label>
             </div>
 
+
+          {/* Inversionistas */}
+          <div>
+            <label className="block text-sm font-semibold">Inversionista</label>
+            <select
+              name="inversionista_uuid"
+              value={producto.inversionista_uuid}
+              onChange={handleInputChange}
+              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white transition duration-300 ease-in-out hover:scale-105"
+              required
+            >
+              {inversionistas.map((inversionista) => (
+                <option key={inversionista.uuid} value={inversionista.uuid}>
+                  {inversionista.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Botones */}
           <div className="mt-6 flex justify-between">

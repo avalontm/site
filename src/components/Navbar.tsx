@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { DarkThemeToggle } from "flowbite-react";
 import { useAuth } from '../AuthContext';
 import { Link, useLocation } from 'react-router-dom';
-import { FaCaretDown, FaBoxOpen, FaUsers } from 'react-icons/fa';
+import { FaCaretDown } from 'react-icons/fa';
 import ModalLogin from './ModalLogin';
 import ModalRegistro from './ModalRegistro';
 import config from "../config";
@@ -15,13 +15,25 @@ const Navbar: React.FC = () => {
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const location = useLocation();
+  const [tooltipVisible, setTooltipVisible] = useState<{ [key: string]: boolean }>({
+    inicio: false,
+    catalogo: false,
+    nosotros: false,
+  });
+  const tooltipTimeout = useRef<{ [key: string]: NodeJS.Timeout | null }>({ productos: null, nosotros: null });
 
-  const openLoginModal = () => setIsLoginModalOpen(true);
-  const closeLoginModal = () => setIsLoginModalOpen(false);
-  const openRegistroModal = () => setIsRegistroModalOpen(true);
-  const closeRegistroModal = () => setIsRegistroModalOpen(false);
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const closeMenu = () => setIsMenuOpen(false);
+  const handleMouseEnter = (tooltip: string) => {
+    tooltipTimeout.current[tooltip] = setTimeout(() => {
+      setTooltipVisible(prev => ({ ...prev, [tooltip]: true }));
+    }, 100);
+  };
+
+  const handleMouseLeave = (tooltip: string) => {
+    if (tooltipTimeout.current[tooltip]) {
+      clearTimeout(tooltipTimeout.current[tooltip]!);
+    }
+    setTooltipVisible(prev => ({ ...prev, [tooltip]: false }));
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -29,7 +41,7 @@ const Navbar: React.FC = () => {
         menuRef.current && !menuRef.current.contains(event.target as Node) &&
         buttonRef.current && !buttonRef.current.contains(event.target as Node)
       ) {
-        closeMenu();
+        setIsMenuOpen(false);
       }
     };
 
@@ -41,33 +53,61 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 border-gray-200 bg-gray-100 dark:bg-gray-900">
-        <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
+      <nav className="bg-nav sticky top-0 z-50 w-full">
+        <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between p-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-            <img src="/assets/logo.jpg" className="h-8" alt="Flowbite Logo" />
-            <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">{config.title}</span>
-          </Link>
+          <div className="mx-auto flex">
+            <img src="/assets/logo.jpg" className="h-8" alt={config.title} />
+          </div>
+          
+          {/* Menú de navegación centrado con ancho dinámico */}
+          <div className="mx-10 flex grow justify-center space-x-4">
+            <Link
+              to="/"
+              className={`relative flex flex-1 items-center justify-center text-gray-800 dark:text-white 
+              ${location.pathname === "/" ? "border-b-2 border-blue-600 text-blue-600 dark:text-blue-400" : "hover:text-blue-600 dark:hover:text-blue-400"} 
+              py-2 transition-all duration-300 ease-in-out`}
+              onMouseEnter={() => handleMouseEnter('inicio')}
+              onMouseLeave={() => handleMouseLeave('inicio')}
+            >
+              <img src='/assets/svg/inicio.svg' alt="Inicio" />
+              {tooltipVisible.inicio && (
+                <div className="absolute top-full mt-1 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-100 transition-opacity duration-300">
+                  Inicio
+                </div>
+              )}
+            </Link>
 
-          {/* Menú de navegación centrado */}
-          <div className="flex space-x-8">
             <Link
               to="/productos"
-              className={`flex items-center space-x-2 text-gray-800 dark:text-white 
+              className={`relative flex flex-1 items-center justify-center text-gray-800 dark:text-white 
               ${location.pathname === "/productos" ? "border-b-2 border-blue-600 text-blue-600 dark:text-blue-400" : "hover:text-blue-600 dark:hover:text-blue-400"} 
-              py-1 transition-all duration-300 ease-in-out`}
+              py-2 transition-all duration-300 ease-in-out`}
+              onMouseEnter={() => handleMouseEnter('catalogo')}
+              onMouseLeave={() => handleMouseLeave('catalogo')}
             >
-              <FaBoxOpen className="text-lg" />
-              <span>Productos</span>
+              <img src='/assets/svg/catalogo.svg' alt="Catálogo" />
+              {tooltipVisible.catalogo && (
+                <div className="absolute top-full mt-1 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-100 transition-opacity duration-300">
+                  Catalogo
+                </div>
+              )}
             </Link>
+
             <Link
               to="/nosotros"
-              className={`flex items-center space-x-2 text-gray-800 dark:text-white 
+              className={`relative flex flex-1 items-center justify-center text-gray-800 dark:text-white 
               ${location.pathname === "/nosotros" ? "border-b-2 border-blue-600 text-blue-600 dark:text-blue-400" : "hover:text-blue-600 dark:hover:text-blue-400"} 
-              py-1 transition-all duration-300 ease-in-out`}
+              py-2 transition-all duration-300 ease-in-out`}
+              onMouseEnter={() => handleMouseEnter('nosotros')}
+              onMouseLeave={() => handleMouseLeave('nosotros')}
             >
-              <FaUsers className="text-lg" />
-              <span>Nosotros</span>
+              <img src='/assets/svg/nosotros.svg' alt="Nosotros" />
+              {tooltipVisible.nosotros && (
+                <div className="absolute top-full mt-1 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-100 transition-opacity duration-300">
+                  Nosotros
+                </div>
+              )}
             </Link>
           </div>
 
@@ -75,10 +115,10 @@ const Navbar: React.FC = () => {
           <div className="flex items-center space-x-4">
             {!isAuthenticated ? (
               <>
-                <button onClick={openLoginModal} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-300 dark:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-800 md:px-5 md:py-2.5">
+                <button onClick={() => setIsLoginModalOpen(true)} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-300 dark:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-800">
                   Iniciar sesión
                 </button>
-                <button onClick={openRegistroModal} className="rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 md:px-5 md:py-2.5">
+                <button onClick={() => setIsRegistroModalOpen(true)} className="rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                   Registrarme
                 </button>
               </>
@@ -86,10 +126,9 @@ const Navbar: React.FC = () => {
               <div className="relative">
                 <button
                   ref={buttonRef}
-                  onClick={toggleMenu}
-                  className="flex items-center justify-center rounded-full bg-gray-200 p-2 text-sm 
-                  font-medium text-gray-800 hover:bg-gray-300 focus:outline-none focus:ring-4 focus:ring-gray-400 
-                  dark:bg-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:ring-gray-300"
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="bg-login flex items-center justify-center rounded-full p-2 text-sm 
+                  font-medium focus:outline-none focus:ring-4"
                 >
                   <img src={user?.avatar || '/assets/perfil_default.png'} alt="Avatar" className="size-10 rounded-full object-cover" />
                   <FaCaretDown className="ml-2 text-sm" />
@@ -99,24 +138,24 @@ const Navbar: React.FC = () => {
                   <div ref={menuRef} className="absolute right-0 mt-2 w-48 rounded-md border border-gray-200 bg-white shadow-lg dark:bg-gray-800">
                     <ul>
                       <li>
-                        <Link to="/perfil" onClick={closeMenu} className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                        <Link to="/perfil" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                           Mi perfil
                         </Link>
                       </li>
                       <li>
-                        <Link to="/carrito" onClick={closeMenu} className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                        <Link to="/carrito" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                           Mi carrito
                         </Link>
                       </li>
                       {role === 'admin' && (
                         <li>
-                          <Link to="/dashboard" onClick={closeMenu} className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                          <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                             Panel Administración
                           </Link>
                         </li>
                       )}
                       <li>
-                        <button onClick={() => { logout(); closeMenu(); }} className="block w-full px-4 py-2 text-left text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                        <button onClick={() => { logout(); setIsMenuOpen(false); }} className="block w-full px-4 py-2 text-left text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                           Cerrar sesión
                         </button>
                       </li>
@@ -126,13 +165,12 @@ const Navbar: React.FC = () => {
               </div>
             )}
 
-            <DarkThemeToggle />
           </div>
         </div>
       </nav>
 
-      <ModalLogin isOpen={isLoginModalOpen} onClose={closeLoginModal} />
-      <ModalRegistro isOpen={isRegistroModalOpen} onClose={closeRegistroModal} />
+      <ModalLogin isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      <ModalRegistro isOpen={isRegistroModalOpen} onClose={() => setIsRegistroModalOpen(false)} />
     </>
   );
 };
