@@ -51,3 +51,39 @@ Si deseas contribuir, por favor crea un fork del repositorio y envía un pull re
 ## Contacto
 Para más información, visita [avalontm.info](http://avalontm.info) o contacta al equipo de desarrollo.
 
+
+## Script para Linux
+```
+sudo nano /etc/systemd/system/site.service
+```
+
+```
+[Unit]
+Description=Servicio de React App
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/avalontm/ftp/site
+ExecStart=/usr/bin/npm start
+Restart=always
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=react-site
+
+[Install]
+WantedBy=multi-user.target
+```
+
+### Recarga los servicios de systemd para que el nuevo servicio se registre:
+```
+sudo systemctl daemon-reload
+```
+
+```
+sudo systemctl enable site.service
+```
+
