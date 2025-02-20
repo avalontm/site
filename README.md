@@ -64,12 +64,10 @@ After=network.target
 
 [Service]
 Type=simple
-User=root
 WorkingDirectory=/home/avalontm/ftp/site
-ExecStart=/usr/bin/npm start
+ExecStart=/usr/local/bin/serve -s . -p 8080
 Restart=always
-Environment=PATH=/usr/bin:/usr/local/bin
-Environment=NODE_ENV=production
+Environment=PATH=/usr/bin:/usr/local/bin:/bin:/usr/sbin:/sbin
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=react-site
