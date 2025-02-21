@@ -85,3 +85,87 @@ sudo systemctl daemon-reload
 sudo systemctl enable site.service
 ```
 
+### NGINX (archivo de configuracion)
+```
+# Detectar bots antes de definir la configuración del servidor
+map $http_user_agent $is_bot {
+    default 0;
+    "~*(Twitterbot|facebookexternalhit|WhatsApp|Slackbot|Googlebot|Bingbot|LinkedInBot|Discordbot)" 1;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name avalontm.info www.avalontm.info 192.206.141.160;
+
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name avalontm.info www.avalontm.info 192.206.141.160;
+
+    ssl_certificate /etc/letsencrypt/live/avalontm.info/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/avalontm.info/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # Redirigir bots a Flask para pre-renderizar el HTML
+    location ~ ^/producto/([a-zA-Z0-9\-]+)$ {
+        set $uuid $1;
+
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        #  Si es un bot, lo redirige al backend Flask para pre-renderizar
+        if ($is_bot = 1) {
+            rewrite ^/producto/([a-zA-Z0-9\-]+)$ /api/producto/render/$1 break;
+	    proxy_pass http://127.0.0.1:8081;
+        }
+
+        # Si no es un bot, React maneja la ruta
+        try_files $uri /index.html;
+    }
+
+    # Proxy a Flask para la API (sin /api en la URL)
+    location /producto/render/ {
+        proxy_pass http://127.0.0.1:8081;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8081;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+
+```
+
+### NGINX (soluciones)
+```
+sudo chown -R www-data:www-data /home/avalontm/ftp/site
+```
+
+### FTP (soluciones)
+
+```
+chown -R avalontm:www-data /home/avalontm/ftp/site
+chmod -R 775 /home/avalontm/ftp/site
+```

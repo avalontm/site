@@ -88,13 +88,16 @@ const ProductDetail = () => {
   }
 
   return (
+    <>
     <div className="flex w-full items-center justify-center">
       <Helmet>
-        <title>{product?.nombre} | Partybara</title>
+        <title>{product?.nombre}</title>
         <meta name="description" content={product?.descripcion} />
         <meta property="og:title" content={product?.nombre} />
+        <meta property="og:description" content={product?.descripcion} />
         <meta property="og:image" content={product?.imagen} />
-        <meta property="og:url" content={window.location.href} />
+        <meta property="og:url" content={`${window.location.origin}/producto/${product?.uuid}`} />
+        <meta property="og:type" content="product" />
       </Helmet>
 
       {/* Contenedor del producto */}
@@ -167,6 +170,7 @@ const ProductDetail = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
