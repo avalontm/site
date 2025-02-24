@@ -20,6 +20,7 @@ const ProductoForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded]  = useState(false);
   const [saving, setSaving] = useState(false);
+  const [generando, setGenerando] = useState(false);
 
   // Definir los textos y colores según la bandera
   const flags: { [key: number]: { text: string; bgColor: string } } = {
@@ -219,6 +220,37 @@ useEffect(() => {
     }
   };
 
+  const generarDescripcion = async () => {
+    if (!producto.nombre) {
+      toast.warning("Por favor, ingresa un título para generar la descripción.");
+      return;
+    }
+
+    setGenerando(true);
+
+    try {
+      const response = await fetch("https://avalontm.info/api/openai/generar-descripcion", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ nombre_producto: producto.nombre }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.descripcion) {
+        handleInputChange({ target: { name: "descripcion", value: data.descripcion } });
+      } else {
+        toast.error("Error al generar la descripción: " + data.error);
+      }
+    } catch (error) {
+      toast.error("Error de conexión con la API.");
+    }
+
+    setGenerando(false);
+  };
+
   return (
     <div className="flex min-h-screen w-full flex-col items-center rounded-lg bg-gray-900 p-8 text-white">
       <h1 className="text-3xl font-bold">{uuid ? "Editar Producto" : "Crear Producto"}</h1>
@@ -278,7 +310,22 @@ useEffect(() => {
           {/* Descripción */}
           <div>
             <label className="block text-sm font-semibold">Descripción</label>
-            <EditorHtml name="descripcion" value={producto.descripcion} onChange={handleInputChange} />
+            <div className="relative">
+              <EditorHtml
+                name="descripcion"
+                value={producto.descripcion}
+                disabled={generando}
+                onChange={handleInputChange}
+              />
+             <button
+                  type="button"
+                  onClick={generarDescripcion}
+                  className="mt-2 flex w-full items-center justify-center rounded bg-black px-4 py-2 text-white hover:bg-gray-950"
+                  disabled={generando}
+                >
+                  {generando ? <MiniLoading /> : "Generar Descripción"}
+              </button>
+            </div>
           </div>
 
           {/* Precio */}
