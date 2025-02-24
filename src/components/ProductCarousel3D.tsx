@@ -43,7 +43,7 @@ const ProductCarousel3D: React.FC<ProductCarousel3DProps> = ({ images }) => {
         className="mySwiper"
       >
         {images.map((image, index) => (
-          <SwiperSlide key={index} className="size-60">
+          <SwiperSlide key={index} className="size-96">
             <img
               src={image || defaultImage}
               alt={`Product ${index + 1}`}

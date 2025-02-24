@@ -7,14 +7,13 @@ import VideoPlayer from "../components/Video";
 import CustomerReviews from "../components/CustomerReviews";
 import SplitText from "../components/SplitText";
 import RotatingText from "../components/RotatingText";
+import { Helmet } from "react-helmet-async";
 
 const Home = () => {
   const images = [
-    "/assets/banner.jpg",
-    "/assets/banner.jpg",
-    "/assets/banner.jpg",
-    "/assets/banner.jpg",
-    "/assets/banner.jpg",
+    "/assets/banners/banner_funkos.jpg",
+    "/assets/banners/banner_vinilos.jpg",
+    "/assets/banners/banner_coleccionables.jpg",
   ];
 
   const handleAnimationComplete = () => {
@@ -22,8 +21,10 @@ const Home = () => {
   };
   
   return (
-    <div className="flex flex-col items-center justify-center">
-
+    <div className="flex min-h-screen flex-col items-center">
+      <Helmet>
+        <title>Inicio</title>
+      </Helmet>
        {/* Carrusel de imágenes */}
        <Carousel images={images} />
        

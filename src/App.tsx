@@ -11,6 +11,9 @@ import { useAuth } from "./AuthContext";
 import CarritoButton from "./components/CarritoButton";
 import { CartProvider } from "./CartContext";
 import { ToastContainer } from "react-toastify";
+import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
+import Share from "./pages/Share";
 
 // Carga diferida (lazy loading)
 const Perfil = lazy(() => import("./pages/Perfil"));
@@ -38,14 +41,26 @@ function App() {
   return (
     <CartProvider>
       <BrowserRouter basename="">
+      {/* Agregamos el ScrollToTop para reiniciar el scroll al cambiar de página */}
+      <ScrollToTop />
       <Navbar />
-        <div className="flex flex-col">
+        <div className="flex h-screen flex-col">
          
-          <main className="flex flex-col items-center justify-center gap-6 p-4 sm:p-8 lg:p-16">
+          <main className="flex flex-col items-center justify-center gap-6 p-4 sm:p-4 lg:p-4">
             <Routes>
               {/* Rutas de la aplicación */}
               <Route path="/" element={<Home />} />
               <Route path="/nosotros" element={<About />} />
+
+              {/* Ruta para compartir productos */}
+              <Route
+                path="/compartir/:uuid"
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <Share />
+                  </Suspense>
+                }
+              />
 
               {/* Ruta para productos */}
               <Route
@@ -133,6 +148,9 @@ function App() {
             closeOnClick={true}
             pauseOnHover={true}
           />
+
+           {/* Footer siempre abajo */}
+           <Footer />
         </div>
       </BrowserRouter>
     </CartProvider>

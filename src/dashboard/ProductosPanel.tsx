@@ -5,11 +5,14 @@ import { Category } from "../interfaces/Category";
 import config from "../config";
 import Loading from "../components/Loading";
 import MiniLoading from "../components/MiniLoading";
+import { toast } from "react-toastify";
 
 const ProductosPanel = () => {
   const [productos, setProductos] = useState<Product[]>([]);
   const [categorias, setCategorias] = useState<Category[]>([]);
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>("");
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>(
+    localStorage.getItem("categoriaSeleccionada") || ""
+  );
   const [pagina, setPagina] = useState<number>(1);
   const [totalPaginas, setTotalPaginas] = useState<number>(1);
   const [categoriasCargadas, setCategoriasCargadas] = useState<boolean>(false);
@@ -18,9 +21,35 @@ const ProductosPanel = () => {
   const [productoAEliminar, setProductoAEliminar] = useState<Product | null>(null);
   const [eliminando, setEliminando] = useState<boolean>(false);  // Estado para seguimiento de eliminación
 
+  const cargarCategorias = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) return toast.error("No se encontró el token de autenticación.");
+    
+    try {
+      const response = await fetch(`${config.apiUrl}/categoria/listar`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      setCategorias(data);
+      setCategoriasCargadas(true);
+
+      if (!categoriaSeleccionada && data.length > 0) {
+        setCategoriaSeleccionada(data[0].uuid);
+        localStorage.setItem("categoriaSeleccionada", data[0].uuid);
+      }
+    } catch (error) {
+      toast.error("Error al cargar categorías: " + error);
+    }
+  };
+
   const cargarProductos = async () => {
     const token = localStorage.getItem("authToken");
-    if (!token) return console.error("No se encontró el token de autenticación.");
+    if (!token) 
+      return toast.error("No se encontró el token de autenticación.");
     
     try {
       const response = await fetch(
@@ -34,34 +63,13 @@ const ProductosPanel = () => {
         }
       );
       const data = await response.json();
-      console.log(data);
       setProductos(data.productos);
       setTotalPaginas(data.totalPaginas);
     } catch (err) {
+      toast.error("Error al cargar productos: " + err);
       setError((err as Error).message);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const cargarCategorias = async () => {
-    const token = localStorage.getItem("authToken");
-    if (!token) return console.error("No se encontró el token de autenticación.");
-    
-    try {
-      const response = await fetch(`${config.apiUrl}/categoria/listar`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      setCategorias(data);
-      setCategoriasCargadas(true);
-      if (data.length > 0) setCategoriaSeleccionada(data[0].uuid);
-    } catch (error) {
-      console.error("Error al cargar categorías:", error);
     }
   };
 
@@ -84,18 +92,19 @@ const ProductosPanel = () => {
 
   const manejarCategoria = (evento: React.ChangeEvent<HTMLSelectElement>) => {
     setCategoriaSeleccionada(evento.target.value);
+    localStorage.setItem("categoriaSeleccionada", evento.target.value);
     setPagina(1);
   };
 
   // Función para eliminar un producto
   const eliminarProducto = async (uuid: string) => {
     const token = localStorage.getItem("authToken");
-    if (!token) return console.error("No se encontró el token de autenticación.");
+    if (!token) return toast.error("No se encontró el token de autenticación.");
 
     setEliminando(true);  // Iniciar spinner de eliminación
 
     try {
-      const response = await fetch(`${config.apiUrl}/product/dashboard/${uuid}`, {
+      const response = await fetch(`${config.apiUrl}/producto/panel/${uuid}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -104,21 +113,22 @@ const ProductosPanel = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Error al eliminar el producto");
+        toast.error("Error al eliminar el producto");
+        return;
       }
 
       // Filtrar la lista de productos después de eliminar
       setProductos(productos.filter((producto) => producto.uuid !== uuid));
       setProductoAEliminar(null); // Cerrar el diálogo después de eliminar
     } catch (error) {
-      console.error("Error al eliminar producto:", error);
+      toast.error("Error al eliminar producto: " + error);
     } finally {
       setEliminando(false);  // Finalizar spinner de eliminación
     }
   };
 
   return (
-    <div className="flex w-full flex-col items-center bg-gray-900 p-8 text-white">
+    <div className="flex min-h-screen w-full flex-col items-center rounded-lg bg-gray-900 p-8 text-white">
       <h1 className="text-3xl font-bold">Panel de Productos</h1>
 
       {loading ? (

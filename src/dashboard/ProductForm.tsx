@@ -6,6 +6,8 @@ import Loading from "../components/Loading";
 import { Category } from "../interfaces/Category";
 import { Investor } from "../interfaces/Investor";
 import EditorHtml from "../components/EditorHtml";
+import { toast } from "react-toastify";
+import MiniLoading from "../components/MiniLoading";
 
 const ProductoForm = () => {
   const { uuid } = useParams<string>(); // Obtener el uuid de los parámetros de la URL (si existe)
@@ -17,9 +19,15 @@ const ProductoForm = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded]  = useState(false);
-  
-  // Función para hacer una pausa (sleep) de X milisegundos
-  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+  const [saving, setSaving] = useState(false);
+
+  // Definir los textos y colores según la bandera
+  const flags: { [key: number]: { text: string; bgColor: string } } = {
+    0: { text: "NORMAL", bgColor: "bg-green-500" },
+    1: { text: "NUEVO", bgColor: "bg-green-500" },
+    2: { text: "OFERTA", bgColor: "bg-red-500" },
+    3: { text: "EXCLUSIVO", bgColor: "bg-purple-600" },
+  };
 
   // Función para cargar las categorías
   const cargarCategorias = async () => {
@@ -62,6 +70,8 @@ const ProductoForm = () => {
         setInversionista(data);
       } catch (error) {
         console.error("Error al cargar inversinistas:", error);
+      } finally {
+        setSaving(false);
       }
     };
 
@@ -89,18 +99,17 @@ const ProductoForm = () => {
       
     } catch (error) {
       setError("Error al cargar el producto.");
-    }finally
-    {
-        setLoading(false);
     }
   };
   
   // Función para guardar el producto (crear o actualizar)
   const guardarProducto = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
     const token = localStorage.getItem("authToken");
     if (!token) {
-      console.error("No se encontró el token de autenticación.");
+      toast.error("No se encontró el token de autenticación.");
+      setSaving(false);
       return;
     }
  
@@ -109,7 +118,7 @@ const ProductoForm = () => {
     : `${config.apiUrl}/producto/panel/crear`; // Si no existe un uuid o está vacío, estamos creando
 
     const method = (uuid && uuid.trim()) ? "PUT" : "POST"; // PUT para editar, POST para crear
-    console.log(JSON.stringify(producto));
+
     try {
       const response = await fetch(url, {
         method: method,
@@ -119,15 +128,19 @@ const ProductoForm = () => {
         },
         body: JSON.stringify(producto), // Enviar el objeto completo incluyendo categoria_uuid
       });
+
       const data = await response.json();
-      console.log(data);
+
       if (data.status) {
+        toast.success("Producto guardado correctamente.");
         navigate("/dashboard/productos"); // Redirigir a la lista de productos
       } else {
-        setError(data.error);
+        toast.error(data.error || "Error desconocido al guardar el producto.");
       }
-    } catch (error) {
-      setError(error);
+    } catch (error : any) {
+      toast.error(error.error || "Error al conectar con el servidor.");
+    }finally{
+      setSaving(false);
     }
   };
   
@@ -167,7 +180,6 @@ useEffect(() => {
 
 
   useEffect(() => {
-    console.log("categorias: " + categorias.length);
     // Cuando el producto cambia, aseguramos que la categoría también lo haga
     if (categorias.length > 0) {
       setProducto((prevProducto) => ({
@@ -178,7 +190,6 @@ useEffect(() => {
   }, [producto.categoria_uuid, categorias]);
 
   useEffect(() => {
-    console.log("inversionistas: " + inversionistas.length);
     // Cuando el producto cambia, aseguramos que el inversionista también lo haga
     if ( inversionistas.length > 0) {
       setProducto({
@@ -209,7 +220,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="flex w-full flex-col items-center bg-gray-900 p-8 text-white">
+    <div className="flex min-h-screen w-full flex-col items-center rounded-lg bg-gray-900 p-8 text-white">
       <h1 className="text-3xl font-bold">{uuid ? "Editar Producto" : "Crear Producto"}</h1>
 
       {loading ? (
@@ -309,6 +320,24 @@ useEffect(() => {
             />
           </div>
 
+          {/* Banderas */}
+          <div>
+            <label className="block text-sm font-semibold">Bandera</label>
+            <select
+              name="bandera"
+              value={producto.bandera}
+              onChange={handleInputChange}
+              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white transition duration-300 ease-in-out hover:scale-105"
+              required
+            >
+              {Object.entries(flags).map(([key, { text }]) => (
+                <option key={key} value={key}>
+                  {text}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Imagen */}
           <div>
             <label className="block text-sm font-semibold">Imagen</label>
@@ -316,7 +345,7 @@ useEffect(() => {
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white"
+              className="w-full rounded-lg bg-gray-700 px-6 py-3 text-white"
             />
             {producto.imagen && <img src={producto.imagen} alt="Imagen del producto" className="mt-4 size-32 object-cover" />}
           </div>
@@ -365,11 +394,12 @@ useEffect(() => {
 
           {/* Botones */}
           <div className="mt-6 flex justify-between">
-            <button
+          <button
               type="submit"
               className="rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
+              disabled={saving}
             >
-              {uuid ? "Guardar Cambios" : "Crear Producto"}
+              {saving ? <MiniLoading /> : (uuid ? "Guardar Cambios" : "Crear Producto")}
             </button>
             <Link
               to="/dashboard/productos"

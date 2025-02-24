@@ -1,25 +1,30 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
-import { Product } from '../interfaces/Product';  // Importar la interfaz Product
+import { Product } from '../interfaces/Product';
 
 const defaultImage = "/assets/default-product.png"; // Imagen por defecto
 
 const ProductCard = ({ product }: { product: Product }) => {
   const nameRef = useRef<HTMLHeadingElement | null>(null);
   const [isLongName, setIsLongName] = useState(false);
-  const [isHovered, setIsHovered] = useState(false); // Para saber si la tarjeta está siendo "hovered"
+  const [isHovered, setIsHovered] = useState(false);
 
-  // Revisa si el nombre del producto es más largo que el contenedor
   useEffect(() => {
     if (nameRef.current) {
       setIsLongName(nameRef.current.scrollWidth > nameRef.current.clientWidth);
     }
   }, [product.nombre]);
 
-  // Controlar animación solo cuando el mouse está encima de la tarjeta
   const handleMouseEnter = () => setIsHovered(true);
   const handleMouseLeave = () => setIsHovered(false);
+
+  // Definir los textos y colores según la bandera
+  const flagConfig: { [key: number]: { text: string; bgColor: string } } = {
+    1: { text: "NUEVO", bgColor: "bg-green-500" },
+    2: { text: "OFERTA", bgColor: "bg-red-500" },
+    3: { text: "EXCLUSIVO", bgColor: "bg-purple-600" },
+  };
 
   return (
     <motion.div
@@ -29,33 +34,60 @@ const ProductCard = ({ product }: { product: Product }) => {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+
+    {/* Bandera vertical en el lado izquierdo */}
+    {product.bandera > 0 && (
+      <div className="absolute left-3 top-0 z-10 flex flex-col items-center">
+        {/* Cuerpo del listón */}
+        <div
+          className={`relative w-6 px-2 py-1 text-xs font-bold uppercase tracking-wide text-white ${flagConfig[product.bandera].bgColor}`}
+          style={{
+            padding: "5px 5px 5px 0",
+            writingMode: "vertical-rl",
+            textOrientation: "upright",
+            fontWeight:"800"
+          }}
+        >
+          {flagConfig[product.bandera].text}
+        </div>
+
+        {/* Puntas */}
+        <div
+          className={`size-0 border-x-[12px] border-b-8 ${flagConfig[product.bandera].bgColor} border-x-transparent`}
+        ></div>
+
+      </div>
+    )}
+
+      {/* Imagen del producto */}
       <Link to={`/producto/${product.uuid}`} className="w-full">
         <img
-          className="mt-4 h-64 w-full overflow-hidden rounded-lg object-contain object-center" // Se agregó overflow-hidden
-          src={product.imagen || defaultImage} // Imagen del producto o la de respaldo
+          className="mt-4 h-64 w-full overflow-hidden rounded-lg object-contain object-center"
+          src={product.imagen || defaultImage}
           alt={product.nombre}
-          onError={(e) => (e.currentTarget.src = defaultImage)} // Si hay error, cambia a la imagen por defecto
+          onError={(e) => (e.currentTarget.src = defaultImage)}
         />
       </Link>
       <div className="flex flex-col p-4">
         <h5
-          ref={nameRef} // Asignamos la referencia al título
+          ref={nameRef}
           className={`text-xl font-semibold text-gray-900 dark:text-white ${isLongName && isHovered ? 'animate-scrollText' : ''}`}
           style={{
-            whiteSpace: 'nowrap', // Impide el salto de línea
-            overflow: isHovered && isLongName ? 'visible' : 'hidden', // Si se está animando, el texto se muestra completo
-            textOverflow: isHovered && isLongName ? 'unset' : 'ellipsis', // Quita "..." si el texto está siendo animado
-            transform: isHovered ? 'translateX(0)' : 'translateX(0)', // Mantiene la posición original
-            animationPlayState: isHovered && isLongName ? 'running' : 'paused', // Controla la animación dependiendo del estado del hover
-            paddingLeft: isHovered && isLongName ? '10px' : '0px',  // Agregar padding a la izquierda solo cuando se anime
-            paddingRight: isHovered && isLongName ? '10px' : '0px', // Agregar padding a la derecha solo cuando se anime
+            whiteSpace: 'nowrap',
+            overflow: isHovered && isLongName ? 'visible' : 'hidden',
+            textOverflow: isHovered && isLongName ? 'unset' : 'ellipsis',
+            transform: isHovered ? 'translateX(0)' : 'translateX(0)',
+            animationPlayState: isHovered && isLongName ? 'running' : 'paused',
+            paddingLeft: isHovered && isLongName ? '10px' : '0px',
+            paddingRight: isHovered && isLongName ? '10px' : '0px',
           }}
         >
           {product.nombre}
         </h5>
-
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-xl font-bold text-gray-900 dark:text-white">${product.precio.toFixed(2)}</span>
+          <span className="text-xl font-bold text-gray-900 dark:text-white">
+            ${product.precio.toFixed(2)}
+          </span>
         </div>
       </div>
     </motion.div>

@@ -1,25 +1,45 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 
-body {
-  font-family: 'Montserrat', sans-serif;
-  background-color: #eeceb6
+@font-face {
+  font-family: "Proxima Nova";
+  src: url("/assets/fonts/font-medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
 }
+
+@font-face {
+  font-family: "Proxima Nova";
+  src: url("/assets/fonts/font-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Aplicar en body (por defecto usa Medium) */
+body {
+  font-family: "Proxima Nova", sans-serif;
+  background-color: #ededed;
+  font-weight: 500; /* Medium */
+}
+
+/* Si quieres aplicar Bold en ciertas partes */
+h1, h2, h3, .bold-text {
+  font-weight: 700; /* Bold */
+}
+
 
 /* ESTILO DE COLORES PARA LA PAGINA*/
 
-
-.bg{
-  background-color: #eeceb6;
+.bg {
+  background-color: #ededed;
 }
 
 .bg-nav {
-  background-color: #3f5064;
+  background-color: #000;
   border-bottom: 1px solid #2c3e50;
+  color: white;
 }
-
 .bg-cart
 {
   color: white;
@@ -33,7 +53,7 @@ body {
 }
 
 .bg-login:hover {
-  background-color: #d95d06; /* Un tono más oscuro al pasar el mouse */
+  background-color: #d15d08; /* Un tono más oscuro al pasar el mouse */
   transform: scale(1.05); /* Efecto de crecimiento ligero */
 }
 
@@ -43,6 +63,10 @@ body {
   transform: scale(1.05);
 }
 
+.bg-footer{
+  background-color: #000;
+  border-top: 1px solid #2c3e50;
+}
 .perspective {
   perspective: 1000px;
 }

@@ -111,6 +111,9 @@ server {
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
+    root /home/avalontm/ftp/site;
+    index index.html;
+
     # Redirigir bots a Flask para pre-renderizar el HTML
     location ~ ^/producto/([a-zA-Z0-9\-]+)$ {
         set $uuid $1;
@@ -122,20 +125,11 @@ server {
         #  Si es un bot, lo redirige al backend Flask para pre-renderizar
         if ($is_bot = 1) {
             rewrite ^/producto/([a-zA-Z0-9\-]+)$ /api/producto/render/$1 break;
-	    proxy_pass http://127.0.0.1:8081;
+            proxy_pass http://127.0.0.1:8081;
         }
 
         # Si no es un bot, React maneja la ruta
-        try_files $uri /index.html;
-    }
-
-    # Proxy a Flask para la API (sin /api en la URL)
-    location /producto/render/ {
-        proxy_pass http://127.0.0.1:8081;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        try_files $uri $uri/ /index.html;
     }
 
     location /api/ {
@@ -146,13 +140,13 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # Servir archivos estáticos desde /assets/
+    location /assets/ {
+        alias /home/avalontm/ftp/site/assets/;
+    }
+
     location / {
-        proxy_pass http://127.0.0.1:8080;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
+        try_files $uri /index.html;
     }
 }
 
@@ -161,6 +155,13 @@ server {
 ### NGINX (soluciones)
 ```
 sudo chown -R www-data:www-data /home/avalontm/ftp/site
+```
+
+### Alternativa
+```
+sudo chmod -R 755 /home/avalontm/ftp/site/
+sudo chmod -R 755 /home/avalontm/ftp/site/assets/
+sudo find /home/avalontm/ftp/site/assets/ -type f -exec chmod 644 {} \;
 ```
 
 ### FTP (soluciones)

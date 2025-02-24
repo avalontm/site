@@ -12,6 +12,7 @@ export class Product {
   precio: number = 0;
   cantidad: number = 1;
   no_disponible: boolean = false;
+  bandera: number = 0;
 
   constructor(init?: Partial<Product>) {
     Object.assign(this, init);

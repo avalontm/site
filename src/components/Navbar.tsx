@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { DarkThemeToggle } from "flowbite-react";
 import { useAuth } from '../AuthContext';
 import { Link, useLocation } from 'react-router-dom';
-import { FaCaretDown } from 'react-icons/fa';
+import { FaCaretDown, FaBars, FaTimes } from 'react-icons/fa';
 import ModalLogin from './ModalLogin';
 import ModalRegistro from './ModalRegistro';
 import config from "../config";
@@ -12,28 +11,10 @@ const Navbar: React.FC = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegistroModalOpen, setIsRegistroModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const location = useLocation();
-  const [tooltipVisible, setTooltipVisible] = useState<{ [key: string]: boolean }>({
-    inicio: false,
-    catalogo: false,
-    nosotros: false,
-  });
-  const tooltipTimeout = useRef<{ [key: string]: NodeJS.Timeout | null }>({ productos: null, nosotros: null });
-
-  const handleMouseEnter = (tooltip: string) => {
-    tooltipTimeout.current[tooltip] = setTimeout(() => {
-      setTooltipVisible(prev => ({ ...prev, [tooltip]: true }));
-    }, 100);
-  };
-
-  const handleMouseLeave = (tooltip: string) => {
-    if (tooltipTimeout.current[tooltip]) {
-      clearTimeout(tooltipTimeout.current[tooltip]!);
-    }
-    setTooltipVisible(prev => ({ ...prev, [tooltip]: false }));
-  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -56,69 +37,93 @@ const Navbar: React.FC = () => {
       <nav className="bg-nav sticky top-0 z-50 w-full">
         <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between p-4">
           {/* Logo */}
-          <div className="mx-auto flex">
-            <img src="/assets/logo.jpg" className="h-8" alt={config.title} />
-          </div>
-          
-          {/* Menú de navegación centrado con ancho dinámico */}
-          <div className="mx-10 flex grow justify-center space-x-4">
-            <Link
-              to="/"
-              className={`relative flex flex-1 items-center justify-center text-gray-800 dark:text-white 
-              ${location.pathname === "/" ? "border-b-2 border-blue-600 text-blue-600 dark:text-blue-400" : "hover:text-blue-600 dark:hover:text-blue-400"} 
-              py-2 transition-all duration-300 ease-in-out`}
-              onMouseEnter={() => handleMouseEnter('inicio')}
-              onMouseLeave={() => handleMouseLeave('inicio')}
-            >
-              <img src='/assets/svg/inicio.svg' alt="Inicio" />
-              {tooltipVisible.inicio && (
-                <div className="absolute top-full mt-1 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-100 transition-opacity duration-300">
-                  Inicio
-                </div>
-              )}
-            </Link>
-
-            <Link
-              to="/productos"
-              className={`relative flex flex-1 items-center justify-center text-gray-800 dark:text-white 
-              ${location.pathname === "/productos" ? "border-b-2 border-blue-600 text-blue-600 dark:text-blue-400" : "hover:text-blue-600 dark:hover:text-blue-400"} 
-              py-2 transition-all duration-300 ease-in-out`}
-              onMouseEnter={() => handleMouseEnter('catalogo')}
-              onMouseLeave={() => handleMouseLeave('catalogo')}
-            >
-              <img src='/assets/svg/catalogo.svg' alt="Catálogo" />
-              {tooltipVisible.catalogo && (
-                <div className="absolute top-full mt-1 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-100 transition-opacity duration-300">
-                  Catalogo
-                </div>
-              )}
-            </Link>
-
-            <Link
-              to="/nosotros"
-              className={`relative flex flex-1 items-center justify-center text-gray-800 dark:text-white 
-              ${location.pathname === "/nosotros" ? "border-b-2 border-blue-600 text-blue-600 dark:text-blue-400" : "hover:text-blue-600 dark:hover:text-blue-400"} 
-              py-2 transition-all duration-300 ease-in-out`}
-              onMouseEnter={() => handleMouseEnter('nosotros')}
-              onMouseLeave={() => handleMouseLeave('nosotros')}
-            >
-              <img src='/assets/svg/nosotros.svg' alt="Nosotros" />
-              {tooltipVisible.nosotros && (
-                <div className="absolute top-full mt-1 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-100 transition-opacity duration-300">
-                  Nosotros
-                </div>
-              )}
-            </Link>
+          <div className="flex items-center">
+            <img src="/assets/logo.png" className="h-12" alt={config.title} />
           </div>
 
-          {/* Botones de autenticación y menú de usuario */}
-          <div className="flex items-center space-x-4">
+          {/* Botón menú hamburguesa en móvil */}
+          <button
+            className="block text-white focus:outline-none  md:hidden"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+          </button>
+
+          {/* Menú de navegación */}
+          <div className={`bg-nav absolute left-0 top-16 w-full text-white shadow-lg transition-all duration-300 md:static md:flex md:w-auto md:space-x-4 md:bg-transparent md:shadow-none ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
+            <div className="flex flex-col space-y-2 text-white md:flex-row md:items-center md:space-x-4 md:space-y-0">
+              <Link to="/" className={`px-4 py-2 ${location.pathname === "/" ? "border-b-2 border-blue-600 text-blue-600" : "hover:text-blue-600"} transition-all duration-300`}>
+                Inicio
+              </Link>
+              <Link to="/productos" className={`px-4 py-2 ${location.pathname === "/productos" ? "border-b-2 border-blue-600 text-blue-600" : "hover:text-blue-600"} transition-all duration-300`}>
+                Catálogo
+              </Link>
+              <Link to="/nosotros" className={`px-4 py-2 ${location.pathname === "/nosotros" ? "border-b-2 border-blue-600 text-blue-600" : "hover:text-blue-600"} transition-all duration-300`}>
+                Nosotros
+              </Link>
+
+              {/* Botones de autenticación en móvil */}
+              {!isAuthenticated ? (
+                <div className="bg-nav mt-2 flex flex-col space-y-2 p-5 md:hidden">
+                  <button onClick={() => setIsLoginModalOpen(true)} className="w-full rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-300">
+                    Conectarme
+                  </button>
+                  <button onClick={() => setIsRegistroModalOpen(true)} className="w-full rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800">
+                    Registrarme
+                  </button>
+                </div>
+              ) : (
+                <div className="relative mt-2 p-5 md:hidden">
+                  <button
+                    ref={buttonRef}
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="bg-login flex w-full items-center justify-center rounded-full p-2 text-sm font-medium"
+                  >
+                    <img src={user?.avatar || '/assets/perfil_default.png'} alt="Avatar" className="size-10 rounded-full object-cover" />
+                    <FaCaretDown className="ml-2 text-sm" />
+                  </button>
+
+                  {isMenuOpen && (
+                    <div ref={menuRef} className="absolute left-0 mt-2 w-full rounded-md border border-gray-200 bg-white text-black shadow-lg ">
+                      <ul>
+                        <li>
+                          <Link to="/perfil" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm hover:bg-gray-100 ">
+                            Mi perfil
+                          </Link>
+                        </li>
+                        <li>
+                          <Link to="/carrito" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm hover:bg-gray-100 ">
+                            Mi carrito
+                          </Link>
+                        </li>
+                        {role === 'admin' && (
+                          <li>
+                            <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm hover:bg-gray-100 ">
+                              Panel Administración
+                            </Link>
+                          </li>
+                        )}
+                        <li>
+                          <button onClick={() => { logout(); setIsMenuOpen(false); }} className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
+                            Cerrar sesión
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Botones de autenticación en escritorio */}
+          <div className="hidden items-center space-x-4 text-black md:flex">
             {!isAuthenticated ? (
               <>
-                <button onClick={() => setIsLoginModalOpen(true)} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-300 dark:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-800">
-                  Iniciar sesión
+                <button onClick={() => setIsLoginModalOpen(true)} className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-300">
+                  Conectarme
                 </button>
-                <button onClick={() => setIsRegistroModalOpen(true)} className="rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                <button onClick={() => setIsRegistroModalOpen(true)} className="rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800">
                   Registrarme
                 </button>
               </>
@@ -127,8 +132,7 @@ const Navbar: React.FC = () => {
                 <button
                   ref={buttonRef}
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="bg-login flex items-center justify-center rounded-full p-2 text-sm 
-                  font-medium focus:outline-none focus:ring-4"
+                  className="bg-login flex items-center justify-center rounded-full p-2 text-sm font-medium "
                 >
                   <img src={user?.avatar || '/assets/perfil_default.png'} alt="Avatar" className="size-10 rounded-full object-cover" />
                   <FaCaretDown className="ml-2 text-sm" />
@@ -138,24 +142,24 @@ const Navbar: React.FC = () => {
                   <div ref={menuRef} className="absolute right-0 mt-2 w-48 rounded-md border border-gray-200 bg-white shadow-lg dark:bg-gray-800">
                     <ul>
                       <li>
-                        <Link to="/perfil" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                        <Link to="/perfil" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
                           Mi perfil
                         </Link>
                       </li>
                       <li>
-                        <Link to="/carrito" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
-                          Mi carrito
-                        </Link>
-                      </li>
-                      {role === 'admin' && (
-                        <li>
-                          <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
-                            Panel Administración
+                          <Link to="/carrito" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm hover:bg-gray-100 ">
+                            Mi carrito
                           </Link>
                         </li>
-                      )}
+                        {role === 'admin' && (
+                          <li>
+                            <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm hover:bg-gray-100 ">
+                              Panel Administración
+                            </Link>
+                          </li>
+                        )}
                       <li>
-                        <button onClick={() => { logout(); setIsMenuOpen(false); }} className="block w-full px-4 py-2 text-left text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                        <button onClick={() => { logout(); setIsMenuOpen(false); }} className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
                           Cerrar sesión
                         </button>
                       </li>
@@ -164,7 +168,6 @@ const Navbar: React.FC = () => {
                 )}
               </div>
             )}
-
           </div>
         </div>
       </nav>

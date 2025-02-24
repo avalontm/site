@@ -18,7 +18,7 @@ const Carrito: React.FC = () => {
   }, 0);
 
   return (
-    <div className="mx-auto w-full">
+    <div className="mx-auto min-h-screen w-full">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Mi carrito</h1>
       <div className="mt-8 rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
         <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-300">Productos en el carrito</h2>

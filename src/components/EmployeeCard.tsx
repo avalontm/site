@@ -31,7 +31,7 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee }) => {
           <h2 className="mt-4 break-words text-center text-lg font-bold text-gray-900 dark:text-white">
             {employee.name}
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-300">{employee.role}</p>
+          <p className="text-center text-sm text-gray-600 dark:text-gray-300">{employee.role}</p>
         </div>
 
         {/* Lado trasero */}

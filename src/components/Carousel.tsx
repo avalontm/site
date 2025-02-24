@@ -1,4 +1,4 @@
-import { useState, useEffect, SetStateAction } from "react";
+import { useState, useEffect } from "react";
 
 interface CarouselProps {
   images: string[]; // Propiedad para recibir las imágenes
@@ -15,31 +15,28 @@ export default function Carousel({ images }: CarouselProps) {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
   };
 
-  const goToSlide = (index: SetStateAction<number>) => {
+  const goToSlide = (index: number) => {
     setCurrentIndex(index);
   };
 
-  // Set an interval to automatically change the slide
   useEffect(() => {
     const intervalId = setInterval(() => {
-      nextSlide(); // Move to the next slide every 3 seconds
+      nextSlide();
     }, 3000);
 
-    // Clean up the interval on component unmount
     return () => clearInterval(intervalId);
   }, []);
 
   return (
-    <div className="relative w-full">
+    <div className="relative overflow-hidden">
       {/* Carousel wrapper */}
-      <div className="relative h-56 overflow-hidden rounded-lg md:h-96">
+      <div className="flex transition-transform duration-1000"
+        style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
         {images.map((src, index) => (
           <img
             key={index}
             src={src}
-            className={`absolute block w-full transition-opacity duration-700 ease-in-out ${
-              index === currentIndex ? "opacity-100" : "opacity-0"
-            } left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2`}
+            className="w-full shrink-0 object-cover md:h-96"
             alt={`Slide ${index + 1}`}
           />
         ))}
