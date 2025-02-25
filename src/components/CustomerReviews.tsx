@@ -1,6 +1,9 @@
-import { useCallback } from "react";
-import useEmblaCarousel from "embla-carousel-react";
-import { Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { Star } from "lucide-react";
 import { Review } from "../interfaces/Review";
 
 const reviews: Review[] = [
@@ -9,49 +12,35 @@ const reviews: Review[] = [
   { id: 3, name: "Carlos López", comment: "Muy satisfecho con la atención al cliente. Volveré a comprar.", avatar: "https://randomuser.me/api/portraits/men/3.jpg", rating: 5 },
   { id: 4, name: "Ana Martínez", comment: "Gran calidad en los productos. Seguro compraré otra vez.", avatar: "https://randomuser.me/api/portraits/women/4.jpg", rating: 5 },
   { id: 5, name: "Pedro Ramírez", comment: "Servicio rápido y eficiente. Todo perfecto.", avatar: "https://randomuser.me/api/portraits/men/5.jpg", rating: 4 },
-  { id: 6, name: "Laura Torres", comment: "El empaque fue impecable. Muy recomendado.", avatar: "https://randomuser.me/api/portraits/women/6.jpg", rating: 5 },
-  { id: 7, name: "Fernando Castillo", comment: "Productos de alta calidad. Muy contento.", avatar: "https://randomuser.me/api/portraits/men/7.jpg", rating: 5 },
-  { id: 8, name: "Gabriela Ríos", comment: "Superó mis expectativas. Excelente atención.", avatar: "https://randomuser.me/api/portraits/women/8.jpg", rating: 5 },
-  { id: 9, name: "Javier Núñez", comment: "Buena relación calidad-precio. Volveré a comprar.", avatar: "https://randomuser.me/api/portraits/men/9.jpg", rating: 4 },
-  { id: 10, name: "Silvia Herrera", comment: "Lo mejor que he comprado este año. Increíble.", avatar: "https://randomuser.me/api/portraits/women/10.jpg", rating: 5 }
+  { id: 6, name: "Laura Torres", comment: "El empaque fue impecable. Muy recomendado.", avatar: "https://randomuser.me/api/portraits/women/6.jpg", rating: 5 }
 ];
 
 const CustomerReviews = () => {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    align: "start",
-    containScroll: "trimSnaps"
-  });
-
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
-
-  const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
-
   return (
-    <div className="relative flex flex-col items-center overflow-hidden p-6">
+    <div className="relative mx-auto flex w-full max-w-[480px] flex-col items-center overflow-hidden p-6 sm:max-w-screen-sm lg:max-w-screen-2xl">
       <h2 className="mb-4 text-center text-2xl font-bold dark:text-white">Opiniones de Clientes</h2>
 
-      {/* Botón Izquierdo */}
-      <button
-        onClick={scrollPrev}
-        className="absolute left-2 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white p-2 shadow-lg dark:bg-gray-700 sm:flex"
-      >
-        <ChevronLeft size={24} />
-      </button>
-
-      {/* Carrusel */}
-      <div className="w-full overflow-hidden" ref={emblaRef}>
-        <div className="flex">
+      <div className="relative w-full max-w-full">
+        <Swiper
+          modules={[Navigation, Pagination, Autoplay]}
+          spaceBetween={10}
+          slidesPerView={1}
+          breakpoints={{
+            640: { slidesPerView: 2 },
+            1024: { slidesPerView: 3 },
+          }}
+          pagination={{ clickable: true }}
+          autoplay={{ delay: 4000, disableOnInteraction: false }}
+          loop
+          navigation={{
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+          }}
+          className="w-full max-w-full"
+        >
           {reviews.map((review) => (
-            <div
-              key={review.id}
-              className="box-border w-full flex-none px-2 sm:w-1/3 md:w-1/3 lg:w-1/4"
-            >
-              <div className="rounded-lg bg-white p-4 text-center shadow-md dark:bg-gray-700">
+            <SwiperSlide key={review.id} className="flex justify-center">
+              <div className="w-[90%] max-w-[460px] rounded-lg bg-white p-4 text-center shadow-md sm:max-w-screen-sm lg:max-w-screen-2xl">
                 <img src={review.avatar} alt={review.name} className="mx-auto mb-3 size-16 rounded-full" />
                 <h3 className="font-semibold dark:text-white">{review.name}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">{review.comment}</p>
@@ -65,20 +54,17 @@ const CustomerReviews = () => {
                   ))}
                 </div>
               </div>
-            </div>
+            </SwiperSlide>
           ))}
-        </div>
-      </div>
+        </Swiper>
 
-      {/* Botón Derecho */}
-      <button
-        onClick={scrollNext}
-        className="absolute right-2 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white p-2 shadow-lg dark:bg-gray-700 sm:flex"
-      >
-        <ChevronRight size={24} />
-      </button>
+        {/* Flechas de navegación (se ocultan en móviles) */}
+        <button className="swiper-button-prev absolute left-0 top-1/2 hidden -translate-y-1/2 text-gray-700 sm:flex" />
+        <button className="swiper-button-next absolute right-0 top-1/2 hidden -translate-y-1/2 text-gray-700 sm:flex" />
+      </div>
     </div>
   );
 };
+
 
 export default CustomerReviews;

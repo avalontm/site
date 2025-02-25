@@ -8,6 +8,7 @@ interface AuthContextType {
   user: { avatar: string; name: string };
   login: (token: string, role: string, avatar: string, name: string) => void;
   logout: () => void;
+  updateAvatar: (newAvatar: string) => void; // Nueva función para actualizar el avatar
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,16 +16,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [role, setRole] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true); // Estado de carga
+  const [loading, setLoading] = useState<boolean>(true);
   const [user, setUser] = useState<{ avatar: string; name: string }>({
-    avatar: '/assets/perfil_default.png', // Avatar predeterminado
-    name: '', // Nombre predeterminado
+    avatar: '/assets/perfil_default.png',
+    name: '',
   });
 
   useEffect(() => {
     setLoading(true);
 
-    // Lógica para verificar el estado de la autenticación
     const token = localStorage.getItem('authToken');
     const userRole = localStorage.getItem('userRole');
     const userName = localStorage.getItem('userName');
@@ -36,29 +36,23 @@ export const AuthProvider: React.FC = ({ children }) => {
         avatar: userAvatar && userAvatar.trim() !== "" ? userAvatar : '/assets/perfil_default.png',
         name: userName || ''
       });
-      setRole(userRole); // Establecer el rol
+      setRole(userRole);
     } else {
-      setUser({
-        avatar: '/perfil_default.png',  // Avatar predeterminado si no hay avatar en localStorage
-        name: ''
-      });
+      setUser({ avatar: '/assets/perfil_default.png', name: '' });
       setIsAuthenticated(false);
-      setRole(null); // Asegúrate de limpiar el rol si no está autenticado
+      setRole(null);
     }
 
-    setLoading(false); // Cambiar el estado de carga a falso después de verificar
+    setLoading(false);
   }, []);
 
   const login = (token: string, role: string, avatar: string, name: string) => {
     localStorage.setItem('authToken', token);
     localStorage.setItem('userRole', role);
-    localStorage.setItem('userName', name); // Guardar el nombre del usuario
-    localStorage.setItem('userAvatar', avatar || '/assets/perfil_default.png');  // Guardar el avatar del usuario
+    localStorage.setItem('userName', name);
+    localStorage.setItem('userAvatar', avatar || '/assets/perfil_default.png');
 
-    setUser({
-      avatar: avatar,
-      name: name || ''
-    });
+    setUser({ avatar, name });
     setIsAuthenticated(true);
     setRole(role);
   };
@@ -70,18 +64,21 @@ export const AuthProvider: React.FC = ({ children }) => {
     localStorage.removeItem('userAvatar');
     setIsAuthenticated(false);
     setRole(null);
-    setUser({
-      avatar: '/assets/perfil_default.png',  // Valor predeterminado
-      name: ''
-    });
+    setUser({ avatar: '/assets/perfil_default.png', name: '' });
+  };
+
+  // Función para actualizar la imagen de perfil
+  const updateAvatar = (newAvatar: string) => {
+    localStorage.setItem('userAvatar', newAvatar); // Guardar en localStorage
+    setUser((prevUser) => ({ ...prevUser, avatar: newAvatar })); // Actualizar el estado
   };
 
   if (loading) {
-    return <div>Cargando...</div>;  // Se muestra "Cargando..." mientras se verifica la autenticación
+    return <div>Cargando...</div>;
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, role, loading, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, role, loading, user, login, logout, updateAvatar }}>
       {children}
     </AuthContext.Provider>
   );

@@ -34,11 +34,13 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className="bg-nav sticky top-0 z-50 w-full">
+      <nav className="bg-nav sticky top-0 z-50 my-0 w-full shadow-md">
         <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between p-4">
           {/* Logo */}
           <div className="flex items-center">
-            <img src="/assets/logo.png" className="h-12" alt={config.title} />
+              <Link to="/">
+                <img src="/assets/logo.png" className="h-12" alt={config.title} />
+              </Link>
           </div>
 
           {/* Botón menú hamburguesa en móvil */}
@@ -52,13 +54,13 @@ const Navbar: React.FC = () => {
           {/* Menú de navegación */}
           <div className={`bg-nav absolute left-0 top-16 w-full text-white shadow-lg transition-all duration-300 md:static md:flex md:w-auto md:space-x-4 md:bg-transparent md:shadow-none ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
             <div className="flex flex-col space-y-2 text-white md:flex-row md:items-center md:space-x-4 md:space-y-0">
-              <Link to="/" className={`px-4 py-2 ${location.pathname === "/" ? "border-b-2 border-blue-600 text-blue-600" : "hover:text-blue-600"} transition-all duration-300`}>
+              <Link to="/" className={`px-4 py-2 ${location.pathname === "/" ? "border-b-2 border-blue-600 text-blue-600" : "hover:text-orange-600"} transition-all duration-300`}>
                 Inicio
               </Link>
-              <Link to="/productos" className={`px-4 py-2 ${location.pathname === "/productos" ? "border-b-2 border-blue-600 text-blue-600" : "hover:text-blue-600"} transition-all duration-300`}>
+              <Link to="/productos" className={`px-4 py-2 ${location.pathname === "/productos" ? "border-b-2 border-blue-600 text-blue-600" : "hover:text-orange-600"} transition-all duration-300`}>
                 Catálogo
               </Link>
-              <Link to="/nosotros" className={`px-4 py-2 ${location.pathname === "/nosotros" ? "border-b-2 border-blue-600 text-blue-600" : "hover:text-blue-600"} transition-all duration-300`}>
+              <Link to="/nosotros" className={`px-4 py-2 ${location.pathname === "/nosotros" ? "border-b-2 border-blue-600 text-blue-600" : "hover:text-orange-600"} transition-all duration-300`}>
                 Nosotros
               </Link>
 

@@ -1,142 +1,246 @@
-import React, { useState } from 'react';
-import config from '../config'; // Asegúrate de importar el archivo de configuración
+import React, { useState, useEffect } from 'react';
+import config from '../config';
+import { toast } from 'react-toastify';
+import Loading from '../components/Loading';
+import { Pencil } from 'lucide-react';
+import { useAuth } from '../AuthContext';
+import MiniLoading from '../components/MiniLoading';
 
 const Perfil: React.FC = () => {
-  const [nombre, setNombre] = useState('Juan Pérez');
-  const [email] = useState('juan.perez@email.com'); // No editable
+  const [nombre, setNombre] = useState('');
+  const [email, setEmail] = useState('');
+  const [telefono, setTelefono] = useState('');
+  const [genero, setGenero] = useState('');
+  const [puntos, setPuntos] = useState(0);
+  const [foto, setFoto] = useState<string | null>(null);
+  const [nuevaFoto, setNuevaFoto] = useState<File | null>(null);
+  const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [telefono, setTelefono] = useState('123-456-7890');
-  const [genero, setGenero] = useState('Masculino');
-  const [foto, setFoto] = useState<string | null>(null);
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar si el formulario está siendo enviado
-  
+  const [isLoading, setIsLoading] = useState(true);
+  const { updateAvatar } = useAuth();
+  const [isUpdating, setIsUpdating] = useState(false);
+
   const fotoPorDefecto = '/assets/perfil_default.png';
 
-  const handleFotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target) setFoto(e.target.result as string);
-      };
-      reader.readAsDataURL(event.target.files[0]);
-    }
-  };
-
-  const handleActualizar = async () => {
-    if (password && password !== confirmPassword) {
-      setError('Las contraseñas no coinciden');
+  const obtenerDatosUsuario = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      toast.error('No se encontró el token de autenticación');
+      setIsLoading(false);
       return;
     }
-    setError('');
-
-    const datosUsuario = {
-      nombre,
-      telefono,
-      genero,
-      password: password || undefined, // No enviar si está vacío
-      foto: foto || undefined, // Enviar solo si hay una imagen
-    };
-
-    setIsSubmitting(true); // Iniciar el estado de espera al enviar
 
     try {
-      const response = await fetch(`${config.apiUrl}/user/edit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosUsuario),
+      const response = await fetch(`${config.apiUrl}/usuario/info`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
 
       if (!response.ok) {
-        throw new Error('Error al actualizar los datos');
+        toast.error('Error al obtener datos del usuario');
+        return;
       }
-      alert('Datos actualizados correctamente');
+
+      const data = await response.json();
+
+      setNombre(data.nombre);
+      setEmail(data.email);
+      setTelefono(data.telefono || '');
+      setGenero(data.genero || '');
+      setPuntos(data.puntos || 0);
+      if (data.avatar) {
+        const nuevaRutaFoto = `${config.apiBase}${data.avatar}`;
+        setFoto(nuevaRutaFoto);
+        updateAvatar(nuevaRutaFoto);
+      }
+
     } catch (error) {
-      setError(error.message);
+      toast.error('Error al cargar los datos');
     } finally {
-      setIsSubmitting(false); // Finalizar el estado de espera
+      setIsLoading(false);
     }
   };
 
-  // Spinner de carga ajustado
-const renderSpinner = () => (
-  <div role="status" className="flex items-center justify-center">
-    <svg
-      aria-hidden="true"
-      className="size-8 animate-spin fill-blue-600 text-gray-200 dark:text-gray-600"
-      viewBox="0 0 100 101"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-        fill="currentColor"
-      />
-      <path
-        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-        fill="currentFill"
-      />
-    </svg>
-    <span className="sr-only">Loading...</span>
-  </div>
-);
+  const handleImagenChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setNuevaFoto(event.target.files[0]);
+      setFoto(URL.createObjectURL(event.target.files[0]));
+    }
+  };
+
+  const actualizarPerfil = async (e: React.FormEvent) => {
+    e.preventDefault(); // Evitar recarga de página
+
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      toast.error('No se encontró el token de autenticación');
+      return;
+    }
+
+    if (password && password !== confirmPassword) {
+      toast.error('Las contraseñas no coinciden');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('nombre', nombre);
+    formData.append('telefono', telefono);
+    formData.append('genero', genero);
+
+    if (nuevaFoto) {
+      formData.append('foto', nuevaFoto);
+    }
+
+    if (password) {
+      formData.append('password', password);
+      formData.append('confirm_password', confirmPassword);
+      formData.append('current_password', currentPassword);
+    }
+
+    try {
+      setIsUpdating(true);
+      const response = await fetch(`${config.apiUrl}/usuario/actualizar`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        toast.error('Error al actualizar el perfil');
+        return;
+      }
+
+      const data = await response.json();
+
+      toast.success('Perfil actualizado correctamente');
+      setNuevaFoto(null);
+      obtenerDatosUsuario();
+      setPassword('');
+      setConfirmPassword('');
+      setCurrentPassword('');
+
+      if (data.avatar) {
+        updateAvatar(data.avatar);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  useEffect(() => {
+    obtenerDatosUsuario();
+  }, []);
 
   return (
-    <>
-    <div className="mx-auto max-w-screen-sm p-4">
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Mi perfil</h1>
-      <div className="mt-4 rounded-md bg-gray-100 p-4 dark:bg-gray-800">
-        <h2 className="text-lg text-gray-700 dark:text-gray-300">Información del usuario</h2>
-        <div className="mt-2 space-y-4">
-          <div className="flex items-center space-x-4">
-            <img src={foto || fotoPorDefecto} alt="Foto de perfil" className="size-20 rounded-full object-cover" />
-            <input type="file" accept="image/*" onChange={handleFotoChange} className="text-gray-600 dark:text-gray-400" />
+    <div className="mx-auto min-h-screen w-full max-w-3xl p-6">
+      <h1 className="text-2xl font-semibold text-gray-900">Mi perfil</h1>
+
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <form onSubmit={actualizarPerfil} className="mt-4 rounded-md bg-gray-100 p-4">
+          <h2 className="text-lg text-gray-700">Información del usuario</h2>
+
+          <div className="mt-2 space-y-4">
+            {/* Imagen de perfil con efecto hover */}
+            <div className="relative flex flex-col items-center">
+              <label htmlFor="foto-input" className="cursor-pointer">
+                <div className="relative size-24 overflow-hidden rounded-full">
+                  <img
+                    src={foto || fotoPorDefecto}
+                    alt="Foto de perfil"
+                    className="size-full object-cover transition-opacity duration-300 hover:opacity-70"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 hover:opacity-100">
+                    <Pencil className="size-6 rounded-full bg-black/50 p-1 text-white" />
+                  </div>
+                </div>
+              </label>
+              <input type="file" id="foto-input" accept="image/*" onChange={handleImagenChange} className="hidden" disabled={isUpdating} />
+            </div>
+
+            <div>
+              <label className="block text-gray-700">Nombre</label>
+              <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} className="w-full rounded-md border p-2" disabled={isUpdating}/>
+            </div>
+
+            <div>
+              <label className="block text-gray-700">Email</label>
+              <input type="email" value={email} disabled className="w-full rounded-md border bg-gray-200 p-2" />
+            </div>
+
+            <div>
+              <label className="block text-gray-700">Teléfono</label>
+              <input type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} className="w-full rounded-md border p-2" disabled={isUpdating}/>
+            </div>
+
+            <div>
+              <label className="block text-gray-700">Género</label>
+              <select value={genero} onChange={(e) => setGenero(e.target.value)} className="w-full rounded-md border p-2" disabled={isUpdating}>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+
+            {/* Puntos */}
+            <div>
+              <label className="block text-gray-700">Puntos</label>
+              <input type="text" value={puntos} disabled className="w-full rounded-md border bg-gray-200 p-2" />
+            </div>
+
+            <div>
+              <label className="block text-gray-700">Contraseña Actual</label>
+              <input
+                type="password"
+                value={currentPassword}
+                disabled={isUpdating}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="w-full rounded-md border p-2"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700">Nueva Contraseña</label>
+              <input
+                type="password"
+                value={password}
+                disabled={isUpdating}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-md border p-2"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700">Confirmar Contraseña</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                disabled={isUpdating}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full rounded-md border p-2"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isUpdating}
+              className="mt-4 w-full rounded-md bg-black px-4 py-2 text-white hover:bg-gray-900 disabled:opacity-50"
+            >
+              {isUpdating ? <MiniLoading /> : 'Guardar cambios'}
+            </button>
+
           </div>
-
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300">Nombre</label>
-            <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} className="w-full rounded-md border p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300">Email</label>
-            <input type="email" value={email} disabled className="w-full rounded-md border bg-gray-200 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300">Contraseña</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full rounded-md border p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300">Confirmar Contraseña</label>
-            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full rounded-md border p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300">Teléfono</label>
-            <input type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} className="w-full rounded-md border p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300">Género</label>
-            <select value={genero} onChange={(e) => setGenero(e.target.value)} className="w-full rounded-md border p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-              <option value="Masculino">Masculino</option>
-              <option value="Femenino">Femenino</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </div>
-        </div>
-
-        {error && <p className="mt-2 text-red-500">{error}</p>}
-
-        <button onClick={handleActualizar} disabled={isSubmitting} className="mt-4 w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600">
-          {isSubmitting ? renderSpinner() : 'Actualizar datos'}
-        </button>
-      </div>
+        </form>
+      )}
     </div>
-    </>
   );
 };
 

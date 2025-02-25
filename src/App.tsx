@@ -46,7 +46,8 @@ function App() {
       <Navbar />
         <div className="flex h-screen flex-col">
          
-          <main className="flex flex-col items-center justify-center gap-6 p-4 sm:p-4 lg:p-4">
+        <main className="mx-auto flex w-full max-w-screen-2xl flex-col items-center justify-center gap-6 p-4">
+
             <Routes>
               {/* Rutas de la aplicación */}
               <Route path="/" element={<Home />} />
@@ -149,9 +150,10 @@ function App() {
             pauseOnHover={true}
           />
 
-           {/* Footer siempre abajo */}
-           <Footer />
+         {/* Footer siempre abajo */}
+         <Footer/>
         </div>
+
       </BrowserRouter>
     </CartProvider>
   );
