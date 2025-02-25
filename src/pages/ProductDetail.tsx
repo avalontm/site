@@ -190,7 +190,7 @@ const ProductDetail = () => {
 
               <div className="mt-6">
                 <button
-                  className="w-full rounded-full bg-black py-3 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:border-2 hover:border-black hover:bg-transparent hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-full border-2 bg-black py-3 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:border-2 hover:border-black hover:bg-transparent hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
                   onClick={handleAddToCart}
                   disabled={product.cantidad <= 0}
                   >
