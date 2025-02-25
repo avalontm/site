@@ -18,16 +18,14 @@
 
 #root {
   max-width: 100vw;
-  overflow-x: hidden;
 }
 
 /* Aplicar en body (por defecto usa Medium) */
-html, body {
+body {
   font-family: "Proxima Nova", sans-serif;
   background-color: #ededed;
   font-weight: 500; /* Medium */
-  overflow-x: hidden;
-  width: 100%;
+
 }
 
 /* Si quieres aplicar Bold en ciertas partes */

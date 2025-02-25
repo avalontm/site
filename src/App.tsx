@@ -39,12 +39,13 @@ const AdminRoute = () => {
 
 function App() {
   return (
+    <div className="w-full overflow-x-hidden">
     <CartProvider>
       <BrowserRouter basename="">
       {/* Agregamos el ScrollToTop para reiniciar el scroll al cambiar de página */}
       <ScrollToTop />
       <Navbar />
-        <div className="flex h-screen flex-col">
+      
          
         <main className="mx-auto flex w-full max-w-screen-2xl flex-col items-center justify-center gap-6 p-4">
 
@@ -152,10 +153,11 @@ function App() {
 
          {/* Footer siempre abajo */}
          <Footer/>
-        </div>
+       
 
       </BrowserRouter>
     </CartProvider>
+    </div>
   );
 }
 

@@ -262,7 +262,7 @@ useEffect(() => {
       ) : error ? (
         <p className="text-center text-lg font-semibold text-red-500">{error}</p>
       ) : (
-        <form onSubmit={guardarProducto} className="mt-6 w-full max-w-lg space-y-4">
+        <form onSubmit={guardarProducto} className="mt-6 w-full max-w-screen-2xl space-y-4">
           {/* Categoría */}
           <div>
             <label className="block text-sm font-semibold">Categoría</label>
@@ -270,7 +270,7 @@ useEffect(() => {
               name="categoria_uuid"
               value={producto.categoria_uuid}
               onChange={handleInputChange}
-              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white transition duration-300 ease-in-out hover:scale-105"
+              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white transition duration-300 ease-in-out hover:scale-[100.5%]"
               required
             >
               {categorias.map((categoria) => (
@@ -374,7 +374,7 @@ useEffect(() => {
               name="bandera"
               value={producto.bandera}
               onChange={handleInputChange}
-              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white transition duration-300 ease-in-out hover:scale-105"
+              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white transition duration-300 ease-in-out hover:scale-[100.5%]"
               required
             >
               {Object.entries(flags).map(([key, { text }]) => (
@@ -428,7 +428,7 @@ useEffect(() => {
               name="inversionista_uuid"
               value={producto.inversionista_uuid}
               onChange={handleInputChange}
-              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white transition duration-300 ease-in-out hover:scale-105"
+              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white transition duration-300 ease-in-out hover:scale-[100.5%]"
               required
             >
               {inversionistas.map((inversionista) => (
