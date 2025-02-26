@@ -5,6 +5,7 @@ import Loading from '../components/Loading';
 import { Pencil } from 'lucide-react';
 import { useAuth } from '../AuthContext';
 import MiniLoading from '../components/MiniLoading';
+import { Helmet } from 'react-helmet-async';
 
 const Perfil: React.FC = () => {
   const [nombre, setNombre] = useState('');
@@ -140,6 +141,9 @@ const Perfil: React.FC = () => {
 
   return (
     <div className="mx-auto min-h-screen w-full max-w-3xl p-6">
+       <Helmet>
+          <title>Perfil</title>
+       </Helmet>
       <h1 className="text-2xl font-semibold text-gray-900">Mi perfil</h1>
 
       {isLoading ? (
