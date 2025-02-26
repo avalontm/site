@@ -14,6 +14,8 @@ import { ToastContainer } from "react-toastify";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import Share from "./pages/Share";
+import Pedidos from "./pages/Pedidos";
+import Ubicacion from "./pages/Ubicacion";
 
 // Carga diferida (lazy loading)
 const Perfil = lazy(() => import("./pages/Perfil"));
@@ -84,6 +86,17 @@ function App() {
                 }
               />
 
+              {/* Ruta para la ubicacion */}
+              <Route
+                path="/ubicacion"
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <Ubicacion />
+                  </Suspense>
+                }
+              />
+
+
               {/* Rutas protegidas para usuarios autenticados */}
               <Route element={<ProtectedRoute />}>
                 <Route
@@ -102,6 +115,16 @@ function App() {
                     </Suspense>
                   }
                 />
+
+                <Route
+                  path="/pedidos"
+                  element={
+                    <Suspense fallback={<Loading />}>
+                      <Pedidos />
+                    </Suspense>
+                  }
+                />
+                
               </Route>
 
               {/* Rutas protegidas solo para administradores */}

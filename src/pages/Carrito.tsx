@@ -31,14 +31,16 @@ const Carrito: React.FC = () => {
         </div>
         <div className="rounded-lg bg-white p-6 shadow-lg">
           <h2 className="text-xl font-semibold">Productos en el carrito</h2>
+          <hr className='my-5'/>
           {cart.length === 0 ? (
             <p className="mt-4 text-gray-600">No hay productos en tu carrito.</p>
           ) : (
-            <ul className="mt-4 space-y-6">
+            <ul className="mt-2 space-y-1">
               {cart.map((producto) => (
                 <li key={producto.uuid} className="border-b pb-6">
-                  <div className="flex items-center space-x-4">
-                    <img src={producto.imagen || defaultImage} alt={producto.nombre} className="size-16 rounded-md object-cover" />
+                  <div className="flex items-center ">
+                    <img src={producto.imagen || defaultImage} alt={producto.nombre} className="size-32 rounded-md object-cover" 
+                    onError={(e) => (e.currentTarget.src = defaultImage)}/>
                     <div className="flex-1 text-center">
                       <span className="block text-lg font-medium">{producto.nombre}</span>
                       

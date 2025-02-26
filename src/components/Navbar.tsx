@@ -56,8 +56,8 @@ const Navbar: React.FC = () => {
               <Link to="/productos" className={`px-4 py-2 ${location.pathname === "/productos" ? "border-b-2 border-blue-600 text-blue-600" : "hover:text-orange-600"} transition-all duration-300`}>
                 Catálogo
               </Link>
-              <Link to="/nosotros" className={`px-4 py-2 ${location.pathname === "/nosotros" ? "border-b-2 border-blue-600 text-blue-600" : "hover:text-orange-600"} transition-all duration-300`}>
-                Nosotros
+              <Link to="/ubicacion" className={`px-4 py-2 ${location.pathname === "/ubicacion" ? "border-b-2 border-blue-600 text-blue-600" : "hover:text-orange-600"} transition-all duration-300`}>
+                Ubicacion
               </Link>
 
               {/* Botones de autenticación en móvil */}
@@ -92,6 +92,11 @@ const Navbar: React.FC = () => {
                         <li>
                           <Link to="/carrito" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm hover:bg-gray-100 ">
                             Mi carrito
+                          </Link>
+                        </li>
+                        <li>
+                          <Link to="/pedidos" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm hover:bg-gray-100 ">
+                            Historial de pedidos
                           </Link>
                         </li>
                         {role === 'admin' && (
@@ -147,6 +152,11 @@ const Navbar: React.FC = () => {
                       <li>
                           <Link to="/carrito" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm hover:bg-gray-100 ">
                             Mi carrito
+                          </Link>
+                        </li>
+                        <li>
+                          <Link to="/pedidos" onClick={() => setIsMenuOpen(false)} className="block px-4 py-2 text-sm hover:bg-gray-100 ">
+                            Historial de pedidos
                           </Link>
                         </li>
                         {role === 'admin' && (

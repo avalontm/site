@@ -22,7 +22,7 @@ const Products = () => {
   const [sortBy, setSortBy] = useState("fecha_creacion"); // Estado para ordenar por precio o fecha
   const [isFocused, setIsFocused] = useState(false);
 
-  // ⏳ Delay de 500ms antes de hacer la búsqueda
+  // Delay de 500ms antes de hacer la búsqueda
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
@@ -31,7 +31,7 @@ const Products = () => {
     return () => clearTimeout(handler);
   }, [search]);
 
-  // 🔄 Función para obtener productos
+  // Función para obtener productos
   const fetchProducts = async (pageNumber: number, reset: boolean = false) => {
     if (!hasMore && !reset) return;
 

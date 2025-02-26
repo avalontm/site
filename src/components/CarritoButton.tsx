@@ -19,7 +19,7 @@ const CarritoButton: React.FC = () => {
   return (
     <button
       onClick={goToCart}
-      className="bg-cart fixed bottom-10 right-10 rounded-full p-4 text-white shadow-lg transition duration-300"
+      className="bg-cart fixed bottom-10 right-10 z-50 rounded-full p-4 text-white shadow-lg transition duration-300"
       aria-label="Ir al carrito"
     >
       <FaShoppingCart className="size-6" /> {/* Ícono de carrito de react-icons */}
