@@ -50,7 +50,7 @@ const Carrito: React.FC = () => {
       });
   
       const data = await response.json();
-  console.log(data);
+
       if (response.ok && data.status) {
         toast.success(`Orden creada con éxito. Número: ${data.numero_orden}`);
         clearCart();
@@ -162,7 +162,14 @@ const Carrito: React.FC = () => {
             <h2 className="text-xl font-bold">Orden Recibida</h2>
             <p className="mt-2">Número de orden: <strong>{modalData.numero_orden}</strong></p>
             <p className="mt-2">{modalData.message}</p>
-            <button onClick={() => setModalData(null)} className="mt-4 w-full rounded bg-red-600 py-2 text-white">Cerrar</button>
+            <div className="mt-4 flex flex-col gap-2">
+              <a href={`/pedido/${modalData.numero_orden}`} className="w-full rounded bg-black py-2 text-center font-bold text-white">
+                Ver Orden
+              </a>
+              <button onClick={() => setModalData(null)} className="w-full rounded bg-red-600 py-2 text-white">
+                Cerrar
+              </button>
+            </div>
           </div>
         </div>
       )}

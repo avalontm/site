@@ -65,11 +65,10 @@ const Pedido: React.FC = () => {
         if (response.ok && data.status) {
           setPedido(data.orden);
         } else {
-          throw new Error(data.message || "Error al obtener el pedido");
+          toast.error(data.message || "Error al obtener el pedido");
         }
       } catch (error) {
         toast.error("Hubo un problema al cargar el pedido.");
-        setError("No se pudo cargar la información del pedido.");
       }
       setLoading(false);
     };
