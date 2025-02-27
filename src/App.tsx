@@ -16,6 +16,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import Share from "./pages/Share";
 import Pedidos from "./pages/Pedidos";
 import Ubicacion from "./pages/Ubicacion";
+import Pedido from "./pages/Pedido";
 
 // Carga diferida (lazy loading)
 const Perfil = lazy(() => import("./pages/Perfil"));
@@ -125,6 +126,15 @@ function App() {
                   }
                 />
                 
+            {/* Ruta para detalles dela orden */}
+              <Route
+                path="/pedido/:id"
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <Pedido />
+                  </Suspense>
+                }
+              />
               </Route>
 
               {/* Rutas protegidas solo para administradores */}
