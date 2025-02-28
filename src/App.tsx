@@ -17,6 +17,8 @@ import Share from "./pages/Share";
 import Pedidos from "./pages/Pedidos";
 import Ubicacion from "./pages/Ubicacion";
 import Pedido from "./pages/Pedido";
+import Orden from "./dashboard/OrdenForm";
+import OrdenForm from "./dashboard/OrdenForm";
 
 // Carga diferida (lazy loading)
 const Perfil = lazy(() => import("./pages/Perfil"));
@@ -163,7 +165,14 @@ function App() {
                     </Suspense>
                   }
                 />
-
+                <Route
+                  path="/dashboard/orden/:uuid?"
+                  element={
+                    <Suspense fallback={<Loading />}>
+                      <OrdenForm />
+                    </Suspense>
+                  }
+                />
               </Route>
 
               {/* Página 404 */}
