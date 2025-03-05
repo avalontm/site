@@ -4,6 +4,9 @@ import { Category } from "../interfaces/Category";
 import { User } from "../interfaces/User";
 import config from "../config";
 import { toast } from "react-toastify";
+import MiniLoading from "../components/MiniLoading";
+import { FaMinus, FaPlus, FaTrashAlt } from "react-icons/fa";
+import { Trash2 } from "lucide-react";
 
 interface CartItem extends Product {
   cantidad: number;
@@ -14,7 +17,7 @@ export default function POSPanel() {
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); // Total de páginas
-  const [hasMore, setHasMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [productSearch, setProductSearch] = useState<string>("");
   const [clientSearch, setClientSearch] = useState<string>("");
@@ -25,7 +28,9 @@ export default function POSPanel() {
   const [paymentMethod, setPaymentMethod] = useState<string>("efectivo");
   const [amountPaid, setAmountPaid] = useState<number | string>("");
   const [pointsUsed, setPointsUsed] = useState<number>(0);
-
+  const [isSelling, setIsSelling] = useState(false);
+  
+  const defaultImage = "/assets/default-product.png";
   let debounceTimer: NodeJS.Timeout;
 
   // Cargar categorías desde la API
@@ -99,14 +104,6 @@ export default function POSPanel() {
     fetchProducts();
   }, [selectedCategory, productSearch, page]);  // Se ejecutará cuando cambie categoría, búsqueda o página
   
-    // Función para manejar la paginación (cargar más productos)
-    const loadMoreProducts = () => {
-        if (hasMore) {
-          setPage((prevPage) => prevPage + 1); // Aumentar la página
-        }
-      };
-    
-
   const addToCart = (product: Product) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.uuid === product.uuid);
@@ -125,25 +122,73 @@ export default function POSPanel() {
     setCart((prevCart) => prevCart.filter((item) => item.uuid !== uuid));
   };
 
-  const handleSell = () => {
-    if (cart.length === 0 || !amountPaid) {
-      toast.info("Por favor, seleccione un cliente, añada productos al carrito y especifique el pago.");
+  {/* REALIZAR VENTA */}
+  const handleSell = async () => {
+    if (cart.length === 0) {
+      toast.info("Por favor, añada productos al carrito antes de continuar.");
+      return;
+    }
+    
+    if (!amountPaid) {
+      toast.info("Por favor, especifique el pago antes de continuar.");
       return;
     }
 
-    const totalWithPoints = total - pointsUsed;
+  const totalWithPoints = total - pointsUsed;
 
-    if (paymentMethod === "efectivo" && Number(amountPaid) + pointsUsed < total) {
-      toast.error("La cantidad pagada no es suficiente.");
+  if (paymentMethod === "efectivo" && Number(amountPaid) + pointsUsed < total) {
+    toast.error("La cantidad pagada no es suficiente.");
+    return;
+  }
+
+  setIsSelling(true); // Iniciar loading
+
+  try {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      toast.error("No se encontró el token de autenticación.");
+      setIsSelling(false);
       return;
     }
 
-    toast.info(`Venta realizada para ${selectedClient ? `${selectedClient.nombre} ${selectedClient.apellido}` : "Público en General"}`);
-    setCart([]); // Limpiar carrito
-    setSelectedClient(null); // Reset cliente
-    setAmountPaid(""); // Reset pago
-    setPointsUsed(0); // Reset puntos usados
-  };
+    const response = await fetch(`${config.apiUrl}/venta/crear`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        cliente: selectedClient ? selectedClient.uuid : null,
+        productos: cart,
+        total: totalWithPoints,
+        metodo_pago: paymentMethod,
+        monto_pagado: amountPaid,
+        puntos_usados: pointsUsed,
+      }),
+    });
+
+    const data = await response.json();
+
+    // Verificar que el status sea True antes de continuar
+    if (!response.ok || !data.status) {
+      toast.error(data.message || "Error al procesar la venta");
+      setIsSelling(false);
+      return;
+    }
+
+    toast.success(`Venta realizada para ${selectedClient ? `${selectedClient.nombre} ${selectedClient.apellido}` : "Público en General"}`);
+
+    // Limpiar el estado después de la venta
+    setCart([]);
+    setSelectedClient(null);
+    setAmountPaid("");
+    setPointsUsed(0);
+  } catch (error) {
+    toast.error(error.message || "Ocurrió un error inesperado");
+  } finally {
+    setIsSelling(false); // Finalizar loading
+  }
+};
 
   const total = cart.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
 
@@ -200,9 +245,30 @@ export default function POSPanel() {
     setSelectedClient(null); // Esto lo dejará en "Público en General"
   };
 
+  const updateQuantity = (uuid: string, newQuantity: number) => {
+    if (newQuantity < 1) return; // Evitar cantidades negativas
+    const updatedCart = cart.map((item) =>
+      item.uuid === uuid ? { ...item, cantidad: newQuantity } : item
+    );
+    setCart(updatedCart); // Actualiza el carrito con la nueva cantidad
+  };
+
+   // Funciones para cambiar de página
+   const goToNextPage = () => {
+     if (page < totalPages) {
+       setCurrentPage(page + 1);
+     }
+   };
+ 
+   const goToPreviousPage = () => {
+     if (page > 1) {
+       setCurrentPage(page - 1);
+     }
+   };
+
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-full flex-col rounded-lg bg-gray-50 p-6 shadow-lg md:flex-row">
-      <div className="mb-4 w-full rounded-lg border bg-white p-4 shadow-md md:mb-0 md:w-2/3">
+    <div className="mx-auto flex min-h-screen w-full max-w-full flex-col rounded-lg bg-gray-50 p-0 shadow-lg md:flex-row">
+      <div className="mb-4 w-full rounded-lg border bg-white p-2 shadow-md md:mb-0 md:w-2/3">
         <h1 className="mb-6 text-center text-3xl font-bold text-gray-800">Punto de Venta</h1>
 
         {/* Carrusel de categorías */}
@@ -233,68 +299,143 @@ export default function POSPanel() {
           />
         </div>
 
-        {/* Cuadrícula de productos */}
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <div key={product.uuid} className="w-full rounded-lg border bg-white p-4 shadow-md transition-transform hover:scale-105">
-              <h2 className="text-lg font-semibold text-gray-800">{product.nombre}</h2>
-              <p className="text-lg text-gray-600">${product.precio}</p>
-              <button
-                className="mt-4 w-full rounded-lg bg-green-500 py-2 font-semibold text-white transition-colors hover:bg-green-600"
-                onClick={() => addToCart(product)}
+      {/* Listado de productos */}
+      <div className="rounded-lg bg-white shadow-lg">
+        <ul className="mt-2 max-h-[835px] min-h-[835px] space-y-1 overflow-y-auto">
+          {products.map((producto) => (
+            <li key={producto.uuid} className="w-full">
+              <button 
+                className="flex w-full items-center border-b bg-white p-4 pb-6 text-left transition hover:bg-gray-100"
+                onClick={() => addToCart(producto)}
               >
-                Agregar al carrito
+                {/* Imagen del producto */}
+                <img
+                  src={producto.imagen || defaultImage}
+                  alt={producto.nombre}
+                  className="mx-4 size-32 rounded-md object-cover"
+                  onError={(e) => (e.currentTarget.src = defaultImage)}
+                />
+
+                {/* Información del producto */}
+                <div className="flex-1">
+                  <span className="block text-lg font-medium">{producto.nombre}</span>
+
+                  {/* Cantidad */}
+                  <div className="mt-2 flex w-full max-w-[480px] sm:max-w-screen-sm lg:max-w-screen-2xl">
+                    <label className="mr-5 py-1">Unidades:</label>
+                    {producto.cantidad === 0 ? (
+                      <span className="w-full max-w-[80px] py-1 text-left font-bold text-red-600">
+                        Agotado
+                      </span>
+                    ) : (
+                      <label className="w-full max-w-[28px] py-1 text-left font-bold text-gray-600">
+                        {producto.cantidad}
+                      </label>
+                    )}
+                  </div>
+
+                </div>
+
+                {/* Precio a la derecha */}
+                <span className="min-w-[80px] text-right text-lg font-bold text-red-600">
+                  ${producto.precio.toFixed(2)}
+                </span>
               </button>
-            </div>
+            </li>
           ))}
+        </ul> 
+      </div>
+      
+        {/* Paginación */}
+        <div className="mt-4 flex w-full items-center justify-between text-center">
+          <button
+            onClick={goToPreviousPage}
+            disabled={currentPage === 1}
+            className="flex-1 rounded-lg bg-blue-500 px-6 py-2 font-semibold text-white hover:bg-blue-600"
+          >
+            Anterior
+          </button>
+
+          <span className="mx-4 text-lg font-semibold">
+            {currentPage} / {totalPages}
+          </span>
+
+          <button
+            onClick={goToNextPage}
+            disabled={currentPage === totalPages}
+            className="flex-1 rounded-lg bg-blue-500 px-6 py-2 font-semibold text-white hover:bg-blue-600"
+          >
+            Siguiente
+          </button>
         </div>
 
-      {/* Cargar más productos */}
-      {hasMore && (
-          <div className="mt-4 text-center">
-            <button
-              onClick={loadMoreProducts}
-              className="rounded-lg bg-blue-500 px-6 py-2 font-semibold text-white hover:bg-blue-600"
-            >
-              Cargar más productos
-            </button>
-          </div>
-        )}
       </div>
 
-      <div className="my-4 border-t border-gray-300 md:hidden"></div>
+      <div className="my-2 border-t border-gray-300 md:hidden"></div>
 
       {/* Carrito a la derecha */}
-      <div className="w-full rounded-lg border bg-white p-4 shadow-md md:w-1/3">
+      <div className="w-full rounded-lg border bg-white p-2 shadow-md md:w-1/3">
         <h2 className="mb-3 text-xl font-bold text-gray-800">Carrito</h2>
-        <div className="mb-4 rounded-lg bg-gray-100 p-4 shadow-md">
+
+        <div className="mb-4 mt-2 max-h-[300px] min-h-[300px] space-y-1 overflow-y-auto rounded-lg bg-gray-100 p-4 shadow-md">
           {cart.length > 0 ? (
             cart.map((item) => (
-              <div key={item.uuid} className="flex justify-between border-b p-3">
-                <span className="font-medium text-gray-700">{item.nombre} x{item.cantidad}</span>
-                <span className="font-medium text-red-500">${item.precio * item.cantidad}</span>
+              <div key={item.uuid} className="grid grid-cols-[1fr_32px_40px_auto] items-center gap-4 border-b p-0">
+                
+                {/* Nombre y cantidad del producto */}
+                <span className="truncate font-medium text-gray-700">
+                  <span className="font-bold">x{item.cantidad}</span> {item.nombre}
+                </span>
+                
+                {/* Botones de incrementar y decrementar unidades en vertical */}
+                <div className="m-0 flex flex-col items-center gap-0 p-0">
+                  {/* Botón para incrementar */}
+                  <button
+                    className="mt-1 flex size-10 items-center justify-center rounded-t-full bg-white p-0 text-gray-600 hover:text-gray-800"
+                    onClick={() => updateQuantity(item.uuid, item.cantidad + 1)}
+                  >
+                    <FaPlus className="size-4" /> {/* Ícono de + */}
+                  </button>
+
+                  {/* Botón para decrementar */}
+                  <button
+                    className="mb-1 flex size-10 items-center justify-center rounded-b-full bg-white p-0 text-gray-600 hover:text-gray-800"
+                    onClick={() => updateQuantity(item.uuid, item.cantidad - 1)}
+                    disabled={item.cantidad <= 1} // Deshabilitar si la cantidad es 1 o menor
+                  >
+                    <FaMinus className="size-4" /> {/* Ícono de - */}
+                  </button>
+                </div>
+
+                {/* Precio alineado a la derecha */}
+                <span className="whitespace-nowrap text-right font-medium text-red-500">
+                  ${item.precio * item.cantidad}
+                </span>
+
+                {/* Botón de eliminar */}
                 <button
                   className="text-red-500 hover:text-red-700"
                   onClick={() => removeFromCart(item.uuid)}
                 >
-                  Eliminar
+                  <Trash2 className="size-5" /> {/* Ícono de basurero */}
                 </button>
               </div>
             ))
           ) : (
-            <p className="text-gray-500">El carrito está vacío</p>
+            <p className="text-center text-gray-500">El carrito está vacío</p>
           )}
         </div>
+
 
         {/* Total */}
         <div className="mt-4 flex justify-between">
           <span className="font-bold text-gray-800">Total</span>
-          <span className="font-bold text-red-500">${total}</span>
+          <span className="text-[24px] font-bold text-red-500">${total}</span>
         </div>
 
-        {/* Cliente */}
+       {/* Cliente */}
         <h2 className="mb-3 text-xl font-bold text-gray-800">Cliente</h2>
-        <div className="mb-6">
+        <div className="relative mb-6">
           <input
             type="text"
             placeholder="Escribir nombre del cliente..."
@@ -302,9 +443,15 @@ export default function POSPanel() {
             onChange={handleClientSearch}
             className="w-full rounded-lg border p-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
-          {isLoadingClients && <p>Cargando clientes...</p>}
+
+          {isLoadingClients && (
+            <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 justify-center">
+              <MiniLoading />
+            </div>
+          )}
+
           {filteredClients.length > 0 && (
-            <ul className="mt-2 max-h-40 overflow-y-auto rounded-lg border bg-white shadow-lg">
+            <ul className="absolute inset-x-0 z-10 mt-1 max-h-40 overflow-y-auto rounded-lg border bg-white shadow-lg">
               {filteredClients.map((client) => (
                 <li
                   key={client.uuid}
@@ -318,7 +465,7 @@ export default function POSPanel() {
           )}
         </div>
 
-        <div className="mb-6">
+        <div className="mb-6 min-h-[250px]">
           <h3 className="text-lg font-semibold">Cliente Actual:</h3>
           <div className="rounded-lg bg-gray-200 p-3 shadow-md">
             {selectedClient ? (
@@ -327,18 +474,30 @@ export default function POSPanel() {
               <p>Publico en General</p>
             )}
           </div>
-        </div>
+       
 
-        {/* Mostrar puntos del cliente */}
-        {selectedClient && (
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold">Puntos Disponibles</h3>
-            <div className="rounded-lg bg-green-100 p-3">
-              <p className="text-xl font-bold text-green-600">{selectedClient.puntos} puntos</p>
-              <p className="text-sm text-gray-600">Puedes usar estos puntos para reducir el total de la venta.</p>
+          {/* Mostrar puntos del cliente */}
+          {selectedClient && (
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold">Puntos Disponibles</h3>
+              <div className="rounded-lg bg-green-100 p-3">
+                <p className="text-xl font-bold text-green-600">{selectedClient.puntos} puntos</p>
+                <p className="text-sm text-gray-600">Puedes usar estos puntos para reducir el total de la venta.</p>
+              </div>
+
+            {selectedClient.puntos > 0 && (
+              <input
+              type="number"
+              value={pointsUsed}
+              onChange={(e) => setPointsUsed(Number(e.target.value))}
+              max={selectedClient.puntos}
+              className="mt-2 w-full rounded-lg border p-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Usar puntos para pagar"
+              />
+            )}
             </div>
-          </div>
-        )}
+          )}
+       </div>
 
         {/* Método de pago */}
         <div className="mb-6">
@@ -346,16 +505,16 @@ export default function POSPanel() {
           <div className="flex space-x-4">
             <button
               onClick={() => setPaymentMethod("efectivo")}
-              className={`rounded-lg px-6 py-2 text-white ${
-                paymentMethod === "efectivo" ? "bg-blue-600" : "bg-gray-300"
+              className={`w-full rounded-lg px-6 py-2 text-white ${
+                paymentMethod === "efectivo" ? "bg-black" : "bg-gray-300"
               }`}
             >
               Efectivo
             </button>
             <button
               onClick={() => setPaymentMethod("tarjeta")}
-              className={`rounded-lg px-6 py-2 text-white ${
-                paymentMethod === "tarjeta" ? "bg-blue-600" : "bg-gray-300"
+              className={`w-full rounded-lg px-6 py-2  text-white ${
+                paymentMethod === "tarjeta" ? "bg-black" : "bg-gray-300"
               }`}
             >
               Tarjeta
@@ -364,7 +523,7 @@ export default function POSPanel() {
         </div>
 
         {/* Monto pagado */}
-        <div className="mb-6">
+        <div className="mb-5">
           <label htmlFor="amountPaid" className="block text-lg font-semibold text-gray-700">Cantidad Pagada</label>
           <input
             id="amountPaid"
@@ -377,9 +536,9 @@ export default function POSPanel() {
         </div>
 
         {/* Finalizar venta */}
-        <div className="mb-6">
+        <div className="mb-0">
         <button
-            onClick={handleSell}
+            onClick={removeClient}
             className="w-full rounded-lg bg-red-600 py-3 font-semibold text-white transition-colors hover:bg-red-700"
           >
             Quitar Cliente
@@ -387,9 +546,9 @@ export default function POSPanel() {
 
           <button
             onClick={handleSell}
-            className="mt-5 w-full rounded-lg bg-green-600 py-3 font-semibold text-white transition-colors hover:bg-green-700"
+            className="mt-5 min-h-[80px] w-full rounded-lg bg-green-600 py-3 font-semibold text-white transition-colors hover:bg-green-700"
           >
-            Vender
+              {isSelling ? <MiniLoading /> : "Realizar Venta"}
           </button>
         </div>
       </div>
