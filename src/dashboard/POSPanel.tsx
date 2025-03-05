@@ -82,8 +82,7 @@ export default function POSPanel() {
         }
   
         const data = await response.json();
-        console.log(data);
-  
+
         // Si hay productos, actualiza el estado
         if (data.productos) {
           setProducts(data.productos);  // Actualiza los productos
