@@ -13,6 +13,12 @@ const AdminPanel = () => {
 
       {/* Contenedor de botones con diseño responsivo */}
       <div className="mt-6 grid w-full max-w-lg grid-cols-1 gap-4 sm:grid-cols-3">
+      <Link
+          to="/dashboard/pos"
+          className="rounded-lg bg-blue-600 px-6 py-3 text-center font-medium text-white transition hover:bg-blue-700"
+        > 
+        Punto de venta
+      </Link>
         <Link
           to="/dashboard/usuarios"
           className="rounded-lg bg-blue-600 px-6 py-3 text-center font-medium text-white transition hover:bg-blue-700"

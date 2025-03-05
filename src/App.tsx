@@ -19,6 +19,7 @@ import Ubicacion from "./pages/Ubicacion";
 import Pedido from "./pages/Pedido";
 import Orden from "./dashboard/OrdenForm";
 import OrdenForm from "./dashboard/OrdenForm";
+import POSPanel from "./dashboard/PosPanel";
 
 // Carga diferida (lazy loading)
 const Perfil = lazy(() => import("./pages/Perfil"));
@@ -170,6 +171,15 @@ function App() {
                   element={
                     <Suspense fallback={<Loading />}>
                       <OrdenForm />
+                    </Suspense>
+                  }
+                />
+
+                <Route
+                  path="/dashboard/pos"
+                  element={
+                    <Suspense fallback={<Loading />}>
+                      <POSPanel />
                     </Suspense>
                   }
                 />
