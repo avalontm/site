@@ -17,9 +17,10 @@ import Share from "./pages/Share";
 import Pedidos from "./pages/Pedidos";
 import Ubicacion from "./pages/Ubicacion";
 import Pedido from "./pages/Pedido";
-import Orden from "./dashboard/OrdenForm";
 import OrdenForm from "./dashboard/OrdenForm";
-import POSPanel from "./dashboard/PosPanel";
+import POSPanel from "./dashboard/POSPanel";
+import SessionExpired from "./pages/SessionExpired"
+import Configuracion from "./dashboard/Configuracion";
 
 // Carga diferida (lazy loading)
 const Perfil = lazy(() => import("./pages/Perfil"));
@@ -33,8 +34,14 @@ const ProtectedRoute = () => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) return <Loading />;
-  return isAuthenticated ? <Outlet /> : <Navigate to="/" />;
+
+  if (!isAuthenticated) {
+    return <Navigate to="/sesion-expirada" />;
+  }
+
+  return <Outlet />;
 };
+
 
 const AdminRoute = () => {
   const { isAuthenticated, role, loading } = useAuth();
@@ -44,6 +51,7 @@ const AdminRoute = () => {
 };
 
 function App() {
+
   return (
     <div className="w-full overflow-x-hidden">
     <CartProvider>
@@ -58,6 +66,8 @@ function App() {
             <Routes>
               {/* Rutas de la aplicación */}
               <Route path="/" element={<Home />} />
+              <Route path="/sesion-expirada" element={<SessionExpired />} />
+
               <Route path="/nosotros" element={<About />} />
 
               {/* Ruta para compartir productos */}
@@ -183,6 +193,15 @@ function App() {
                     </Suspense>
                   }
                 />
+
+                <Route
+                  path="/dashboard/configuracion"
+                  element={
+                    <Suspense fallback={<Loading />}>
+                      <Configuracion />
+                    </Suspense>
+                  }
+                />  
               </Route>
 
               {/* Página 404 */}

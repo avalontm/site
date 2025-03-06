@@ -8,6 +8,7 @@ import { Investor } from "../interfaces/Investor";
 import EditorHtml from "../components/EditorHtml";
 import { toast } from "react-toastify";
 import MiniLoading from "../components/MiniLoading";
+import { flags } from "../interfaces/ProductFlag";
 
 const ProductoForm = () => {
   const { uuid } = useParams<string>(); // Obtener el uuid de los parámetros de la URL (si existe)
@@ -21,14 +22,6 @@ const ProductoForm = () => {
   const [loaded, setLoaded]  = useState(false);
   const [saving, setSaving] = useState(false);
   const [generando, setGenerando] = useState(false);
-
-  // Definir los textos y colores según la bandera
-  const flags: { [key: number]: { text: string; bgColor: string } } = {
-    0: { text: "NORMAL", bgColor: "bg-green-500" },
-    1: { text: "NUEVO", bgColor: "bg-green-500" },
-    2: { text: "OFERTA", bgColor: "bg-red-500" },
-    3: { text: "EXCLUSIVO", bgColor: "bg-purple-600" },
-  };
 
   // Función para cargar las categorías
   const cargarCategorias = async () => {
@@ -252,9 +245,9 @@ useEffect(() => {
   };
 
   return (
-    <div className="flex min-h-screen w-full flex-col items-center rounded-lg bg-gray-900 p-8 text-white">
+    <div className="flex min-h-screen w-full flex-col items-center rounded-lg bg-gray-100 p-8 text-gray-900">
       <h1 className="text-3xl font-bold">{uuid ? "Editar Producto" : "Crear Producto"}</h1>
-
+  
       {loading ? (
         <div className="flex w-full flex-col items-center justify-center p-10">
           <Loading />
@@ -270,7 +263,7 @@ useEffect(() => {
               name="categoria_uuid"
               value={producto.categoria_uuid}
               onChange={handleInputChange}
-              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white transition duration-300 ease-in-out hover:scale-[100.5%]"
+              className="w-full rounded-lg bg-gray-200 px-4 py-3 text-gray-900 transition duration-300 ease-in-out hover:scale-[100.5%]"
               required
             >
               {categorias.map((categoria) => (
@@ -281,19 +274,19 @@ useEffect(() => {
             </select>
           </div>
           
-           {/* SKU */}
-           <div>
+          {/* SKU */}
+          <div>
             <label className="block text-sm font-semibold">SKU</label>
             <input
               type="text"
               name="sku"
               value={producto.sku}
               onChange={handleInputChange}
-              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white"
+              className="w-full rounded-lg bg-gray-200 px-4 py-3 text-gray-900"
               required
             />
           </div>
-
+  
           {/* Nombre */}
           <div>
             <label className="block text-sm font-semibold">Nombre</label>
@@ -302,11 +295,11 @@ useEffect(() => {
               name="nombre"
               value={producto.nombre}
               onChange={handleInputChange}
-              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white"
+              className="w-full rounded-lg bg-gray-200 px-4 py-3 text-gray-900"
               required
             />
           </div>
-
+  
           {/* Descripción */}
           <div>
             <label className="block text-sm font-semibold">Descripción</label>
@@ -317,30 +310,31 @@ useEffect(() => {
                 disabled={generando}
                 onChange={handleInputChange}
               />
-             <button
-                  type="button"
-                  onClick={generarDescripcion}
-                  className="mt-2 flex w-full items-center justify-center rounded bg-black px-4 py-2 text-white hover:bg-gray-950"
-                  disabled={generando}
-                >
-                  {generando ? <MiniLoading /> : "Generar Descripción"}
+              <button
+                type="button"
+                onClick={generarDescripcion}
+                className="mt-2 flex w-full items-center justify-center rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                disabled={generando}
+              >
+                {generando ? <MiniLoading /> : "Generar Descripción"}
               </button>
             </div>
           </div>
-
+  
           {/* Precio */}
           <div>
-                <label className="block text-sm font-semibold">Precio Unitario</label>
-                <input
-                type="number"
-                name="precio_unitario"
-                value={producto.precio_unitario}
-                onChange={handleInputChange}
-                className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white"
-                required
-                />
+            <label className="block text-sm font-semibold">Precio Unitario</label>
+            <input
+              type="number"
+              name="precio_unitario"
+              value={producto.precio_unitario}
+              placeholder="¿Cuanto costo?"
+              onChange={handleInputChange}
+              className="w-full rounded-lg bg-gray-200 px-4 py-3 text-gray-900"
+              required
+            />
           </div>
-
+  
           {/* Precio */}
           <div>
             <label className="block text-sm font-semibold">Precio</label>
@@ -348,12 +342,13 @@ useEffect(() => {
               type="number"
               name="precio"
               value={producto.precio}
+              placeholder="¿Precio al publico?"
               onChange={handleInputChange}
-              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white"
+              className="w-full rounded-lg bg-gray-200 px-4 py-3 text-gray-900"
               required
             />
           </div>
-
+  
           {/* Cantidad */}
           <div>
             <label className="block text-sm font-semibold">Cantidad</label>
@@ -361,12 +356,13 @@ useEffect(() => {
               type="number"
               name="cantidad"
               value={producto.cantidad}
+              placeholder="Unidades disponibles"
               onChange={handleInputChange}
-              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white"
+              className="w-full rounded-lg bg-gray-200 px-4 py-3 text-gray-900"
               required
             />
           </div>
-
+  
           {/* Banderas */}
           <div>
             <label className="block text-sm font-semibold">Bandera</label>
@@ -374,7 +370,7 @@ useEffect(() => {
               name="bandera"
               value={producto.bandera}
               onChange={handleInputChange}
-              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white transition duration-300 ease-in-out hover:scale-[100.5%]"
+              className="w-full rounded-lg bg-gray-200 px-4 py-3 text-gray-900 transition duration-300 ease-in-out hover:scale-[100.5%]"
               required
             >
               {Object.entries(flags).map(([key, { text }]) => (
@@ -384,7 +380,7 @@ useEffect(() => {
               ))}
             </select>
           </div>
-
+  
           {/* Imagen */}
           <div>
             <label className="block text-sm font-semibold">Imagen</label>
@@ -392,35 +388,34 @@ useEffect(() => {
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="w-full rounded-lg bg-gray-700 px-6 py-3 text-white"
+              className="w-full rounded-lg bg-gray-200 px-6 py-3 text-gray-900"
             />
             {producto.imagen && <img src={producto.imagen} alt="Imagen del producto" className="mt-4 size-32 object-cover" />}
           </div>
-
+  
           {/* No disponible */}
-            <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
             <label className="inline-flex items-center text-sm font-semibold">
-                <span className="mr-2">No disponible</span>
-                <div className="relative">
+              <span className="mr-2">No disponible</span>
+              <div className="relative">
                 <input
-                    type="checkbox"
-                    name="no_disponible"
-                    checked={producto.no_disponible}
-                    onChange={(e) => setProducto({ ...producto, no_disponible: e.target.checked })}
-                    className="sr-only"
+                  type="checkbox"
+                  name="no_disponible"
+                  checked={producto.no_disponible}
+                  onChange={(e) => setProducto({ ...producto, no_disponible: e.target.checked })}
+                  className="sr-only"
                 />
                 <div
-                    className={`h-6 w-12 rounded-full transition-all duration-300 ${producto.no_disponible ? 'bg-red-500' : 'bg-gray-400'}`}
+                  className={`h-6 w-12 rounded-full transition-all duration-300 ${producto.no_disponible ? 'bg-red-500' : 'bg-gray-400'}`}
                 >
-                    <div
+                  <div
                     className={`size-6 rounded-full bg-white transition-transform duration-300 ${producto.no_disponible ? 'translate-x-6' : ''}`}
-                    />
+                  />
                 </div>
-                </div>
+              </div>
             </label>
-            </div>
-
-
+          </div>
+  
           {/* Inversionistas */}
           <div>
             <label className="block text-sm font-semibold">Inversionista</label>
@@ -428,7 +423,7 @@ useEffect(() => {
               name="inversionista_uuid"
               value={producto.inversionista_uuid}
               onChange={handleInputChange}
-              className="w-full rounded-lg bg-gray-700 px-4 py-3 text-white transition duration-300 ease-in-out hover:scale-[100.5%]"
+              className="w-full rounded-lg bg-gray-200 px-4 py-3 text-gray-900 transition duration-300 ease-in-out hover:scale-[100.5%]"
               required
             >
               {inversionistas.map((inversionista) => (
@@ -438,10 +433,10 @@ useEffect(() => {
               ))}
             </select>
           </div>
-
+  
           {/* Botones */}
           <div className="mt-6 flex justify-between">
-          <button
+            <button
               type="submit"
               className="rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
               disabled={saving}
@@ -450,7 +445,7 @@ useEffect(() => {
             </button>
             <Link
               to="/dashboard/productos"
-              className="rounded-lg bg-gray-600 px-6 py-3 text-white hover:bg-gray-700"
+              className="rounded-lg bg-gray-300 px-6 py-3 text-gray-900 hover:bg-gray-400"
             >
               Cancelar
             </Link>
@@ -459,6 +454,7 @@ useEffect(() => {
       )}
     </div>
   );
+  
 };
 
 export default ProductoForm;

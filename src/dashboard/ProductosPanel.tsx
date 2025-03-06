@@ -128,7 +128,7 @@ const ProductosPanel = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-full flex-col items-center rounded-lg bg-gray-900 p-8 text-white">
+    <div className="flex min-h-screen w-full flex-col items-center rounded-lg bg-white p-8 text-gray-900">
       <h1 className="text-3xl font-bold">Panel de Productos</h1>
 
       {loading ? (
@@ -144,7 +144,7 @@ const ProductosPanel = () => {
           {/* Filtro por categoría */}
           <div className="mt-6 w-full max-w-lg">
             <select
-              className="w-full rounded-lg bg-gray-700 px-6 py-3 text-white"
+              className="w-full rounded-lg bg-gray-100 px-6 py-3 text-gray-900"
               value={categoriaSeleccionada}
               onChange={manejarCategoria}
             >
@@ -160,16 +160,16 @@ const ProductosPanel = () => {
           <div className="mt-6 max-w-lg">
             <Link
               to="/dashboard/producto"
-              className="w-full rounded-lg bg-blue-600 px-6 py-3 text-center font-medium transition hover:bg-blue-700"
+              className="w-full rounded-lg bg-black px-6 py-3 text-center font-medium text-white transition hover:bg-gray-950"
             >
               Agregar Producto
             </Link>
           </div>
 
           {/* Tabla con los productos */}
-          <div className="mt-6 w-full overflow-x-auto rounded-lg bg-gray-800">
-            <table className="min-w-full text-left text-sm text-gray-400">
-              <thead className="bg-gray-700">
+          <div className="mt-6 w-full overflow-x-auto rounded-lg bg-gray-50">
+            <table className="min-w-full text-left text-sm text-gray-900">
+              <thead className="bg-gray-200">
                 <tr>
                   <th className="px-6 py-3">Imagen</th>
                   <th className="px-6 py-3">Nombre</th>
@@ -180,16 +180,16 @@ const ProductosPanel = () => {
               </thead>
               <tbody>
                 {productos.map((producto) => (
-                  <tr key={producto.uuid} className="border-b border-gray-700">
+                  <tr key={producto.uuid} className="border-b border-gray-200">
                     <td className="px-6 py-4">
                       {/* Verifica si la imagen está presente y muestra la imagen con un tamaño adecuado */}
                       {producto.imagen ? (
                         <a href={`/producto/${producto.uuid}`} target="_blank" rel="noopener noreferrer">
-                        <img
-                          src={producto.imagen}  // Asegúrate de que el campo 'imagen' tenga la URL correcta
-                          alt={producto.nombre}
-                          className="size-16 rounded object-cover"
-                        />
+                          <img
+                            src={producto.imagen}  // Asegúrate de que el campo 'imagen' tenga la URL correcta
+                            alt={producto.nombre}
+                            className="size-16 rounded object-cover"
+                          />
                         </a>
                       ) : (
                         <span>No disponible</span>  // Si no hay imagen, muestra un mensaje alternativo
@@ -200,7 +200,7 @@ const ProductosPanel = () => {
                         {producto.nombre}
                       </a>
                     </td>
-                    <td className="px-6 py-4">${producto.precio}</td>
+                    <td className="px-6 py-4 font-bold text-red-600">${producto.precio.toFixed(2)}</td>
                     <td className="px-6 py-4">{producto.cantidad}</td>
                     <td className="px-6 py-4">
                       <Link
@@ -228,17 +228,17 @@ const ProductosPanel = () => {
           {/* Paginación */}
           <div className="mt-6 flex justify-center">
             <button
-              className="rounded-lg bg-gray-700 px-4 py-2 text-white"
+              className="rounded-lg bg-gray-200 px-4 py-2 text-gray-900"
               onClick={() => cambiarPagina(pagina - 1)}
               disabled={pagina <= 1}
             >
               Anterior
             </button>
-            <span className="px-4 py-2 text-white">
+            <span className="px-4 py-2 text-gray-900">
               Página {pagina} de {totalPaginas}
             </span>
             <button
-              className="rounded-lg bg-gray-700 px-4 py-2 text-white"
+              className="rounded-lg bg-gray-200 px-4 py-2 text-gray-900"
               onClick={() => cambiarPagina(pagina + 1)}
               disabled={pagina >= totalPaginas}
             >
@@ -251,12 +251,12 @@ const ProductosPanel = () => {
       {/* Diálogo de confirmación */}
       {productoAEliminar && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="rounded-lg bg-gray-800 p-6 text-white">
+          <div className="rounded-lg bg-gray-200 p-6 text-gray-900">
             <p>¿Estás seguro de que quieres eliminar "{productoAEliminar.nombre}"?</p>
             <div className="mt-4 flex justify-end">
-              <button className="mr-4 text-gray-400" onClick={() => setProductoAEliminar(null)}>Cancelar</button>
+              <button className="mr-4 text-gray-600" onClick={() => setProductoAEliminar(null)}>Cancelar</button>
               <button
-                className="rounded-lg bg-red-500 px-4 py-2"
+                className="rounded-lg bg-red-500 px-4 py-2 text-white"
                 onClick={() => eliminarProducto(productoAEliminar.uuid)}
                 disabled={eliminando} // Deshabilitar si está eliminando
               >

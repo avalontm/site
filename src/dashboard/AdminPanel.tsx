@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import { FaCashRegister, FaUsers, FaClipboardList, FaBoxOpen, FaRegChartBar } from "react-icons/fa"; // Agregado FaRegChartBar
+import { FaCashRegister, FaUsers, FaClipboardList, FaBoxOpen, FaRegChartBar, FaCog } from "react-icons/fa"; // Agregado FaRegChartBar
 import { useAuth } from "../AuthContext"; // Importamos el hook useAuth
 
 const AdminPanel = () => {
@@ -61,6 +61,15 @@ const AdminPanel = () => {
         >
           <FaRegChartBar className="mr-3 text-3xl" />
           <span>Ver Ventas Realizadas</span>
+        </Link>
+
+        {/* Configuración del Sitio */}
+        <Link
+          to="/dashboard/configuracion"
+          className="flex items-center justify-center rounded-lg bg-gradient-to-r from-gray-400 to-gray-600 px-6 py-4 text-center font-medium text-white shadow-lg transition hover:scale-105 hover:bg-gray-700"
+        >
+          <FaCog className="mr-3 text-3xl" />
+          <span>Configuración del Sitio</span>
         </Link>
       </div>
     </div>

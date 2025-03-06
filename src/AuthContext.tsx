@@ -22,6 +22,23 @@ export const AuthProvider: React.FC = ({ children }) => {
     name: '',
   });
 
+  // Función para verificar si el token ha expirado
+  const isTokenExpired = (token: string): boolean => {
+    const decodedToken = decodeJWT(token);
+    if (!decodedToken) return true;
+    const tokenExpDate = decodedToken.exp * 1000; // Convertir de segundos a milisegundos
+    const currentDate = new Date().getTime();
+    return currentDate > tokenExpDate;
+  };
+
+  // Decodificar el JWT (sin necesidad de librerías externas)
+  const decodeJWT = (token: string) => {
+    const payload = token.split('.')[1];
+    if (!payload) return null;
+    const decoded = atob(payload);
+    return JSON.parse(decoded);
+  };
+
   useEffect(() => {
     setLoading(true);
 
@@ -30,7 +47,7 @@ export const AuthProvider: React.FC = ({ children }) => {
     const userName = localStorage.getItem('userName');
     const userAvatar = localStorage.getItem('userAvatar');
 
-    if (token && userRole) {
+    if (token && userRole && !isTokenExpired(token)) {
       setIsAuthenticated(true);
       setUser({
         avatar: userAvatar && userAvatar.trim() !== "" ? userAvatar : '/assets/perfil_default.png',

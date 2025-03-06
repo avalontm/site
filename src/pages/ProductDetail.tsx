@@ -10,12 +10,7 @@ import config from "../config";
 import { Product } from "../interfaces/Product";
 import Loading from "../components/Loading";
 import { FaShareAlt, FaEdit } from "react-icons/fa";
-
-const flagConfig: { [key: number]: { text: string; bgColor: string } } = {
-  1: { text: "NUEVO", bgColor: "bg-green-500" },
-  2: { text: "OFERTA", bgColor: "bg-red-500" },
-  3: { text: "EXCLUSIVO", bgColor: "bg-purple-600" },
-};
+import { flags } from "../interfaces/ProductFlag";
 
 const ProductDetail = () => {
   const { uuid } = useParams<{ uuid: string }>();
@@ -128,12 +123,12 @@ const ProductDetail = () => {
                 {product.bandera > 0 && (
                   <div className="relative flex items-center">
                     <div
-                      className={`relative px-3 py-1 text-sm font-bold uppercase tracking-wide text-white ${flagConfig[product.bandera].bgColor}`}
+                      className={`relative px-3 py-1 text-sm font-bold uppercase tracking-wide text-white ${flags[product.bandera].bgColor}`}
                     >
-                      {flagConfig[product.bandera].text}
+                      {flags[product.bandera].text}
                     </div>
                     <div
-                      className={`${flagConfig[product.bandera].bgColor} border-r-[12px]`}
+                      className={`${flags[product.bandera].bgColor} border-r-[12px]`}
                       style={{
                         borderTop: "14px solid transparent",
                         borderBottom: "14px solid transparent",

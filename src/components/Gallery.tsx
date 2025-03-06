@@ -18,26 +18,31 @@ const images: Image[] = [
 
 const Gallery: React.FC = () => {
   return (
-    <div className="grid auto-rows-[20vw] grid-cols-3 gap-2 p-4">
-      {images.map((image) => (
-        <div
-          key={image.id}
-          className={`overflow-hidden rounded-lg ${
-            image.size === "square"
-              ? "col-span-1 row-span-1"
-              : image.size === "horizontal"
-              ? "col-span-2 row-span-1"
-              : "col-span-1 row-span-2"
-          }`}
-        >
-          <img
-            src={image.src}
-            alt={image.alt}
-            className="size-full object-cover"
-          />
+    <section id="galeria" className="bg-gray-100 py-20">
+      <div className="container mx-auto text-center">
+        <h2 className="mb-12 text-4xl font-bold text-gray-800">Galería de Productos</h2>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {images.map((image) => (
+            <div
+              key={image.id}
+              className={`overflow-hidden rounded-lg shadow-lg transition-all duration-300 ease-in-out hover:scale-105${
+                image.size === "square"
+                  ? "col-span-1"
+                  : image.size === "horizontal"
+                  ? "col-span-2"
+                  : "col-span-1 row-span-2"
+              }`}
+            >
+              <img
+                src={image.src}
+                alt={image.alt}
+                className="size-full rounded-lg object-cover"
+              />
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      </div>
+    </section>
   );
 };
 

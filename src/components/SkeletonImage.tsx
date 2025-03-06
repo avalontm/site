@@ -7,8 +7,8 @@ interface SkeletonImageProps {
 }
 
 const SkeletonImage: React.FC<SkeletonImageProps> = ({
-  height = 'h-56',
-  width = 'max-w-sm',
+  height = 'h-64', // Mayor altura
+  width = 'w-full', // Ocupa todo el ancho
   className = ''
 }) => {
   return (

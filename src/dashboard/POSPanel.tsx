@@ -8,6 +8,7 @@ import MiniLoading from "../components/MiniLoading";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { Trash2 } from "lucide-react";
 import Loading from "../components/Loading";
+import { Helmet } from "react-helmet-async";
 
 interface CartItem extends Product {
   cantidad: number;
@@ -413,7 +414,9 @@ const continueSell = async() => {
         overflow: "hidden", // Evitar desbordes no deseados
       }}
     >
-
+    <Helmet>
+        <title>Punto de venta</title>
+    </Helmet>
     <div className="mx-auto flex flex-col rounded-lg bg-gray-50 p-0 shadow-lg md:flex-row">
       <div className="w-full rounded-lg border bg-white p-2 shadow-md md:mb-0 md:w-2/3">
         <h1 className="mb-5 text-center text-3xl font-bold text-gray-800">Punto de Venta</h1>

@@ -6,6 +6,7 @@ import ModalLogin from "./ModalLogin";
 import ModalRegistro from "./ModalRegistro";
 import config from "../config";
 import Notificaciones from "./Notificaciones";
+import PrinterButton from "./PrinterButton";
 
 const Navbar: React.FC = () => {
   const { isAuthenticated, logout, user, role } = useAuth();
@@ -113,7 +114,10 @@ const Navbar: React.FC = () => {
               </>
             ) : (
               <div className="flex items-center space-x-4">
-                {/* 🔔 Mostrar campanita SOLO SI es admin */}
+                {/* Mostrar impresora SOLO SI es admin */}
+                {role === "admin" && <PrinterButton />}
+
+                {/* Mostrar campanita SOLO SI es admin */}
                 {role === "admin" && <Notificaciones />}
 
                 {/* Avatar y menú */}

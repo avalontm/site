@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import { Product } from '../interfaces/Product';
+import { flags } from "../interfaces/ProductFlag";
 
 const defaultImage = "/assets/default-product.png"; // Imagen por defecto
 
@@ -19,12 +20,6 @@ const ProductCard = ({ product }: { product: Product }) => {
   const handleMouseEnter = () => setIsHovered(true);
   const handleMouseLeave = () => setIsHovered(false);
 
-  // Definir los textos y colores según la bandera
-  const flagConfig: { [key: number]: { text: string; bgColor: string } } = {
-    1: { text: "NUEVO", bgColor: "bg-green-500" },
-    2: { text: "OFERTA", bgColor: "bg-red-500" },
-    3: { text: "EXCLUSIVO", bgColor: "bg-purple-600" },
-  };
 
   return (
     <motion.div
@@ -40,7 +35,7 @@ const ProductCard = ({ product }: { product: Product }) => {
       <div className="absolute left-3 top-0 z-10 flex flex-col items-center">
         {/* Cuerpo del listón */}
         <div
-          className={`relative w-6 px-2 py-1 text-xs font-bold uppercase tracking-wide text-white ${flagConfig[product.bandera].bgColor}`}
+          className={`relative w-6 px-2 py-1 text-xs font-bold uppercase tracking-wide text-white ${flags[product.bandera].bgColor}`}
           style={{
             padding: "5px 5px 5px 0",
             writingMode: "vertical-rl",
@@ -48,12 +43,12 @@ const ProductCard = ({ product }: { product: Product }) => {
             fontWeight:"800"
           }}
         >
-          {flagConfig[product.bandera].text}
+          {flags[product.bandera].text}
         </div>
 
         {/* Puntas */}
         <div
-          className={`size-0 border-x-[12px] border-b-8 ${flagConfig[product.bandera].bgColor} border-x-transparent`}
+          className={`size-0 border-x-[12px] border-b-8 ${flags[product.bandera].bgColor} border-x-transparent`}
         ></div>
 
       </div>

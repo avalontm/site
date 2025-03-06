@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 
+// Definición del tipo CarouselImage
+type CarouselImage = {
+  uuid: string;
+  imagen: string;
+};
+
 interface CarouselProps {
-  images: string[]; // Propiedad para recibir las imágenes
+  images: CarouselImage[]; // Recibe un array de CarouselImage
 }
 
 export default function Carousel({ images }: CarouselProps) {
@@ -25,17 +31,16 @@ export default function Carousel({ images }: CarouselProps) {
     }, 3000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [currentIndex, images.length]);
 
   return (
     <div className="relative overflow-hidden">
       {/* Carousel wrapper */}
-      <div className="flex transition-transform duration-1000"
-        style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
-        {images.map((src, index) => (
+      <div className="flex transition-transform duration-1000" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+        {images.map((image, index) => (
           <img
-            key={index}
-            src={src}
+            key={image.uuid} // Usamos el uuid como clave
+            src={image.imagen} // Usamos la propiedad 'imagen'
             className="w-full shrink-0 object-cover md:h-96"
             alt={`Slide ${index + 1}`}
           />
@@ -55,22 +60,22 @@ export default function Carousel({ images }: CarouselProps) {
 
       {/* Controls */}
       <button
-        className="absolute start-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4"
+        className="absolute left-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4"
         onClick={prevSlide}
       >
-        <span className="inline-flex size-10 items-center justify-center rounded-full bg-white/30">
-          <svg className="size-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+        <span className="inline-flex items-center justify-center rounded-full bg-white/30 p-2">
+          <svg className="size-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
             <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 1 1 5l4 4"/>
           </svg>
         </span>
       </button>
 
       <button
-        className="absolute end-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4"
+        className="absolute right-0 top-0 z-30 flex h-full cursor-pointer items-center justify-center px-4"
         onClick={nextSlide}
       >
-        <span className="inline-flex size-10 items-center justify-center rounded-full bg-white/30">
-          <svg className="size-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+        <span className="inline-flex items-center justify-center rounded-full bg-white/30 p-2">
+          <svg className="size-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
             <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 9 4-4-4-4"/>
           </svg>
         </span>

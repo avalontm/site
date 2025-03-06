@@ -53,10 +53,10 @@ const Notificaciones = () => {
         setOrdenes(data.ordenes);
       } else {
         setOrdenes([]);
-        console.warn("⚠️ Respuesta inesperada del servidor:", data);
+        console.warn("Respuesta inesperada del servidor:", data);
       }
     } catch (error) {
-      console.error("❌ Error cargando notificaciones:", error);
+      console.error("Error cargando notificaciones:", error);
     } finally {
       setCargando(false);
     }
@@ -68,9 +68,9 @@ const Notificaciones = () => {
     // Conectar a Socket.IO
     socket.connect();
   
-    socket.on("connect", () => console.log(`🔗 Conectado a socket.io: ${socket.id}`));
-    socket.on("disconnect", () => console.warn("⚠️ Socket desconectado"));
-    socket.on("connect_error", (err) => console.error("❌ Error de conexión:", err));
+    socket.on("connect", () => console.log(`Conectado a socket.io: ${socket.id}`));
+    socket.on("disconnect", () => console.warn("Socket desconectado"));
+    socket.on("connect_error", (err) => console.error("Error de conexión:", err));
   
     // Escuchar evento "nueva_orden"
     socket.on("nueva_orden", (orden) => {
