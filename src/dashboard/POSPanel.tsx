@@ -5,14 +5,16 @@ import { User } from "../interfaces/User";
 import config from "../config";
 import { toast } from "react-toastify";
 import MiniLoading from "../components/MiniLoading";
-import { FaMinus, FaPlus, FaTrashAlt } from "react-icons/fa";
+import { FaMinus, FaPlus } from "react-icons/fa";
 import { Trash2 } from "lucide-react";
+import Loading from "../components/Loading";
 
 interface CartItem extends Product {
   cantidad: number;
 }
 
 export default function POSPanel() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]); // Estado para las categorías
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState(1);
@@ -29,9 +31,32 @@ export default function POSPanel() {
   const [amountPaid, setAmountPaid] = useState<number | string>("");
   const [pointsUsed, setPointsUsed] = useState<number>(0);
   const [isSelling, setIsSelling] = useState(false);
-  
+  const [scale, setScale] = useState(1);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(true); // Estado de carga de productos
   const defaultImage = "/assets/default-product.png";
   let debounceTimer: NodeJS.Timeout;
+
+  useEffect(() => {
+    // Agregar una clase para ocultar el layout
+    document.body.classList.add("no-layout");
+
+    return () => {
+      // Restaurar el layout al salir de la página
+      document.body.classList.remove("no-layout");
+    };
+  }, []);
+
+  // Función para confirmar la venta como pendiente
+  const confirmSaleAsPending = () => {
+    setIsModalOpen(false);
+    continueSell();
+  };
+
+  // Función para cancelar la venta
+  const cancelSale = () => {
+    setIsModalOpen(false);
+  };
 
   // Cargar categorías desde la API
   useEffect(() => {
@@ -71,6 +96,7 @@ export default function POSPanel() {
       }
   
       try {
+        setIsLoadingProducts(true);
         // Llamada a la API con parámetros de página y categoría
         const response = await fetch(`${config.apiUrl}/producto/panel/pagina?page=${page}&categoria=${selectedCategory}&buscar=${productSearch}`, {
             method: "GET",
@@ -98,6 +124,9 @@ export default function POSPanel() {
         }
       } catch (error) {
         toast.error("Error al cargar los productos.");
+      }finally
+      {
+        setIsLoadingProducts(false);
       }
     };
   
@@ -107,20 +136,67 @@ export default function POSPanel() {
   const addToCart = (product: Product) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.uuid === product.uuid);
+  
       if (existingItem) {
+        // Si el producto ya está en el carrito, aumentamos la cantidad y descontamos del inventario
+        const updatedProducts = products.map((prod) =>
+          prod.uuid === product.uuid && prod.cantidad > 0
+            ? { ...prod, cantidad: prod.cantidad - 1 } // Descontar del inventario
+            : prod
+        );
+  
+        setProducts(updatedProducts); // Actualiza el inventario
+  
         return prevCart.map((item) =>
           item.uuid === product.uuid
             ? { ...item, cantidad: item.cantidad + 1 }
             : item
         );
+      } else {
+        // Si es la primera vez que se agrega, verificamos si hay suficiente inventario
+        const productInStock = products.find((prod) => prod.uuid === product.uuid);
+  
+        if (productInStock && productInStock.cantidad > 0) {
+          // Descontamos una unidad del inventario
+          const updatedProducts = products.map((prod) =>
+            prod.uuid === product.uuid
+              ? { ...prod, cantidad: prod.cantidad - 1 }
+              : prod
+          );
+  
+          setProducts(updatedProducts); // Actualiza el inventario
+  
+          // Agrega el producto al carrito con una cantidad de 1
+          return [...prevCart, { ...product, cantidad: 1 }];
+        } else {
+          // Si no hay inventario disponible, no se puede agregar el producto
+          console.log('No hay suficiente inventario para este producto');
+          return prevCart;
+        }
       }
-      return [...prevCart, { ...product, cantidad: 1 }];
     });
   };
+  
 
   const removeFromCart = (uuid: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.uuid !== uuid));
+    // Encuentra el producto que se va a eliminar del carrito
+    const itemToRemove = cart.find(item => item.uuid === uuid);
+  
+    if (itemToRemove) {
+      // Regresa las unidades al inventario
+      const updatedProducts = products.map((product) =>
+        product.uuid === uuid
+          ? { ...product, cantidad: product.cantidad + itemToRemove.cantidad }
+          : product
+      );
+      
+      setProducts(updatedProducts); // Actualiza el inventario
+  
+      // Elimina el artículo del carrito
+      setCart((prevCart) => prevCart.filter((item) => item.uuid !== uuid));
+    }
   };
+  
 
   {/* REALIZAR VENTA */}
   const handleSell = async () => {
@@ -134,14 +210,19 @@ export default function POSPanel() {
       return;
     }
 
-  const totalWithPoints = total - pointsUsed;
 
   if (paymentMethod === "efectivo" && Number(amountPaid) + pointsUsed < total) {
-    toast.error("La cantidad pagada no es suficiente.");
+    // Mostrar modal de confirmación
+    setIsModalOpen(true);
     return;
   }
 
+    continueSell();
+};
+
+const continueSell = async() => {
   setIsSelling(true); // Iniciar loading
+  const totalWithPoints = total - pointsUsed;
 
   try {
     const token = localStorage.getItem("authToken");
@@ -247,10 +328,34 @@ export default function POSPanel() {
 
   const updateQuantity = (uuid: string, newQuantity: number) => {
     if (newQuantity < 1) return; // Evitar cantidades negativas
+  
+    // Obtener el producto que se está modificando
     const updatedCart = cart.map((item) =>
       item.uuid === uuid ? { ...item, cantidad: newQuantity } : item
     );
+    
     setCart(updatedCart); // Actualiza el carrito con la nueva cantidad
+  
+    // Actualizar el inventario de productos
+    const updatedProducts = products.map((product) => {
+      const cartItem = cart.find(item => item.uuid === uuid);
+      if (cartItem) {
+        if (newQuantity > cartItem.cantidad) {
+          // Si la cantidad aumentó, descontamos la cantidad de productos disponibles
+          return product.uuid === uuid
+            ? { ...product, cantidad: product.cantidad - (newQuantity - cartItem.cantidad) }
+            : product;
+        } else if (newQuantity < cartItem.cantidad) {
+          // Si la cantidad disminuyó, sumamos la cantidad de productos disponibles
+          return product.uuid === uuid
+            ? { ...product, cantidad: product.cantidad + (cartItem.cantidad - newQuantity) }
+            : product;
+        }
+      }
+      return product;
+    });
+  
+    setProducts(updatedProducts); // Actualiza el inventario de productos
   };
 
    // Funciones para cambiar de página
@@ -266,10 +371,52 @@ export default function POSPanel() {
      }
    };
 
+  useEffect(() => {
+    document.body.classList.add("overflow-hidden");
+
+    return () => {
+      document.body.classList.remove("overflow-hidden"); // Restaurar al salir
+    };
+  }, []);
+
+  useEffect(() => {
+    const actualizarEscala = () => {
+      const alturaDisponible = window.innerHeight; // Altura del viewport
+      const alturaReal = contentRef.current?.scrollHeight || 1; // Altura del contenido
+
+      // Calculamos la escala solo para la altura
+      const nuevaEscala = alturaDisponible / alturaReal;
+
+      // Establecemos la nueva escala solo para el alto
+      setScale(nuevaEscala-0.025);
+    };
+
+    // Inicializar el ajuste de escala al cargar
+    actualizarEscala();
+
+    // Detectar cambios en el tamaño de la ventana
+    window.addEventListener("resize", actualizarEscala);
+
+    return () => {
+      window.removeEventListener("resize", actualizarEscala);
+    };
+  }, []); // La dependencia vacía asegura que se ejecute solo una vez al montar
+  
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-full flex-col rounded-lg bg-gray-50 p-0 shadow-lg md:flex-row">
-      <div className="mb-4 w-full rounded-lg border bg-white p-2 shadow-md md:mb-0 md:w-2/3">
-        <h1 className="mb-6 text-center text-3xl font-bold text-gray-800">Punto de Venta</h1>
+    <div
+      ref={contentRef}
+      style={{
+        transform: `scaleY(${scale})`,
+        transformOrigin: "top",
+        height: "100%", // Ajustar altura según la escala
+        width: "100%",  // Ajustar ancho según la escala
+        overflow: "hidden", // Evitar desbordes no deseados
+      }}
+    >
+
+    <div className="mx-auto flex flex-col rounded-lg bg-gray-50 p-0 shadow-lg md:flex-row">
+      <div className="w-full rounded-lg border bg-white p-2 shadow-md md:mb-0 md:w-2/3">
+        <h1 className="mb-5 text-center text-3xl font-bold text-gray-800">Punto de Venta</h1>
 
         {/* Carrusel de categorías */}
         <div className="mb-4 flex space-x-4 overflow-x-auto p-2">
@@ -300,52 +447,58 @@ export default function POSPanel() {
         </div>
 
       {/* Listado de productos */}
-      <div className="rounded-lg bg-white shadow-lg">
-        <ul className="mt-2 max-h-[835px] min-h-[835px] space-y-1 overflow-y-auto">
-          {products.map((producto) => (
-            <li key={producto.uuid} className="w-full">
-              <button 
-                className="flex w-full items-center border-b bg-white p-4 pb-6 text-left transition hover:bg-gray-100"
-                onClick={() => addToCart(producto)}
-              >
-                {/* Imagen del producto */}
-                <img
-                  src={producto.imagen || defaultImage}
-                  alt={producto.nombre}
-                  className="mx-4 size-32 rounded-md object-cover"
-                  onError={(e) => (e.currentTarget.src = defaultImage)}
-                />
+        <div className="flex max-h-[835px] min-h-[835px] items-center justify-center rounded-lg bg-white shadow-lg">
+          {isLoadingProducts ? (
+            <Loading /> // Mostrar componente de carga mientras se obtienen los productos
+          ) : products.length === 0 ? (
+            // Mostrar mensaje si no hay productos
+            <span className="text-xl font-bold text-gray-600">No hay productos</span>
+          ) : (
+            <ul className="mt-2 max-h-[835px] min-h-[835px] w-full space-y-1 overflow-y-auto">
+              {products.map((producto) => (
+                <li key={producto.uuid} className="w-full">
+                  <button
+                    className="flex w-full items-center border-b bg-white p-4 pb-6 text-left transition hover:bg-gray-100"
+                    onClick={() => addToCart(producto)}
+                  >
+                    {/* Imagen del producto */}
+                    <img
+                      src={producto.imagen || defaultImage}
+                      alt={producto.nombre}
+                      className="mx-4 size-32 rounded-md object-cover"
+                      onError={(e) => (e.currentTarget.src = defaultImage)}
+                    />
 
-                {/* Información del producto */}
-                <div className="flex-1">
-                  <span className="block text-lg font-medium">{producto.nombre}</span>
+                    {/* Información del producto */}
+                    <div className="flex-1">
+                      <span className="block text-lg font-bold">{producto.nombre}</span>
 
-                  {/* Cantidad */}
-                  <div className="mt-2 flex w-full max-w-[480px] sm:max-w-screen-sm lg:max-w-screen-2xl">
-                    <label className="mr-5 py-1">Unidades:</label>
-                    {producto.cantidad === 0 ? (
-                      <span className="w-full max-w-[80px] py-1 text-left font-bold text-red-600">
-                        Agotado
-                      </span>
-                    ) : (
-                      <label className="w-full max-w-[28px] py-1 text-left font-bold text-gray-600">
-                        {producto.cantidad}
-                      </label>
-                    )}
-                  </div>
+                      {/* Cantidad */}
+                      <div className="mt-2 flex w-full max-w-[480px] sm:max-w-screen-sm lg:max-w-screen-2xl">
+                        <label className="mr-5 py-1">Unidades:</label>
+                        {producto.cantidad <= 0 ? (
+                          <span className="w-full max-w-[80px] py-1 text-left font-bold text-red-600">
+                            Agotado
+                          </span>
+                        ) : (
+                          <label className="w-full max-w-[28px] py-1 text-left font-bold text-gray-600">
+                            {producto.cantidad}
+                          </label>
+                        )}
+                      </div>
+                    </div>
 
-                </div>
+                    {/* Precio a la derecha */}
+                    <span className="min-w-[80px] text-right text-lg font-bold text-red-600">
+                      ${producto.precio.toFixed(2)}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
-                {/* Precio a la derecha */}
-                <span className="min-w-[80px] text-right text-lg font-bold text-red-600">
-                  ${producto.precio.toFixed(2)}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul> 
-      </div>
-      
         {/* Paginación */}
         <div className="mt-4 flex w-full items-center justify-between text-center">
           <button
@@ -552,6 +705,32 @@ export default function POSPanel() {
           </button>
         </div>
       </div>
+    </div>
+    
+      {/* Modal de confirmación */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-10 transition-opacity duration-300">
+          <div className="w-96 scale-100 rounded-lg bg-white p-8 opacity-100 shadow-lg transition-all duration-300 ease-out">
+            <h2 className="text-2xl font-semibold text-gray-800">La cantidad no es suficiente</h2>
+            <p className="mt-4 text-gray-600">¿Deseas realizar la venta como pendiente?</p>
+            <div className="mt-6 flex justify-end space-x-4">
+              <button
+                onClick={confirmSaleAsPending}
+                className="rounded-full bg-green-500 px-6 py-2 text-white shadow-md transition-colors hover:bg-green-600"
+              >
+                Sí, hacer pendiente
+              </button>
+              <button
+                onClick={cancelSale}
+                className="rounded-full bg-red-500 px-6 py-2 text-white shadow-md transition-colors hover:bg-red-600"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

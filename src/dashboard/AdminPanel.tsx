@@ -1,41 +1,66 @@
-// src/admins/AdminPanel.tsx
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
+import { FaCashRegister, FaUsers, FaClipboardList, FaBoxOpen, FaRegChartBar } from "react-icons/fa"; // Agregado FaRegChartBar
+import { useAuth } from "../AuthContext"; // Importamos el hook useAuth
 
 const AdminPanel = () => {
+  const { user } = useAuth(); // Usamos useAuth para obtener la información del usuario
+  
   return (
-    <div className="flex min-h-screen w-full flex-col items-center p-4 text-black">
+    <div className="flex min-h-screen w-full flex-col items-center rounded-lg bg-gray-50 p-6">
       <Helmet>
         <title>Panel Administrativo</title>
       </Helmet>
-      <h1 className="text-3xl font-bold">Panel de Administración</h1>
-      <p className="mt-2 text-gray-400">Bienvenido, administrador.</p>
+      <h1 className="text-4xl font-semibold text-blue-900">Panel de Administración</h1>
+      {/* Mostrar el nombre del usuario */}
+      <p className="mt-2 text-gray-500">Bienvenido, {user.name || 'Administrador'}.</p>
 
-      {/* Contenedor de botones con diseño responsivo */}
-      <div className="mt-6 grid w-full max-w-lg grid-cols-1 gap-4 sm:grid-cols-3">
-      <Link
+      {/* Contenedor de botones con diseño responsivo y estilos mejorados */}
+      <div className="mt-8 grid w-full max-w-4xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        
+        {/* Punto de venta */}
+        <Link
           to="/dashboard/pos"
-          className="rounded-lg bg-blue-600 px-6 py-3 text-center font-medium text-white transition hover:bg-blue-700"
-        > 
-        Punto de venta
-      </Link>
+          className="flex items-center justify-center rounded-lg bg-gradient-to-r from-teal-400 to-teal-600 px-6 py-4 text-center font-medium text-white shadow-lg transition hover:scale-105 hover:bg-teal-700"
+        >
+          <FaCashRegister className="mr-3 text-3xl" />
+          <span>Punto de venta</span>
+        </Link>
+
+        {/* Gestionar Usuarios */}
         <Link
           to="/dashboard/usuarios"
-          className="rounded-lg bg-blue-600 px-6 py-3 text-center font-medium text-white transition hover:bg-blue-700"
+          className="flex items-center justify-center rounded-lg bg-gradient-to-r from-purple-400 to-purple-600 px-6 py-4 text-center font-medium text-white shadow-lg transition hover:scale-105 hover:bg-purple-700"
         >
-          Gestionar Usuarios
+          <FaUsers className="mr-3 text-3xl" />
+          <span>Gestionar Usuarios</span>
         </Link>
+
+        {/* Revisar Pedidos */}
         <Link
           to="/dashboard/pedidos"
-          className="rounded-lg bg-green-600 px-6 py-3 text-center font-medium text-white transition hover:bg-green-700" 
+          className="flex items-center justify-center rounded-lg bg-gradient-to-r from-green-400 to-green-600 px-6 py-4 text-center font-medium text-white shadow-lg transition hover:scale-105 hover:bg-green-700"
         >
-          Revisar Pedidos
+          <FaClipboardList className="mr-3 text-3xl" />
+          <span>Revisar Pedidos</span>
         </Link>
+
+        {/* Agregar Producto */}
         <Link
           to="/dashboard/productos"
-          className="rounded-lg bg-yellow-600 px-6 py-3 text-center font-medium text-white transition hover:bg-yellow-700"
+          className="flex items-center justify-center rounded-lg bg-gradient-to-r from-yellow-400 to-yellow-600 px-6 py-4 text-center font-medium text-white shadow-lg transition hover:scale-105 hover:bg-yellow-700"
         >
-          Agregar Producto
+          <FaBoxOpen className="mr-3 text-3xl" />
+          <span>Agregar Producto</span>
+        </Link>
+
+        {/* Ver Ventas Realizadas */}
+        <Link
+          to="/dashboard/ventas"
+          className="flex items-center justify-center rounded-lg bg-gradient-to-r from-indigo-400 to-indigo-600 px-6 py-4 text-center font-medium text-white shadow-lg transition hover:scale-105 hover:bg-indigo-700"
+        >
+          <FaRegChartBar className="mr-3 text-3xl" />
+          <span>Ver Ventas Realizadas</span>
         </Link>
       </div>
     </div>

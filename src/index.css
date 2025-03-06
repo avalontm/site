@@ -33,6 +33,11 @@ h1, h2, h3, .bold-text {
   font-weight: 700; /* Bold */
 }
 
+.no-layout nav,
+.no-layout header,
+.no-layout footer {
+  display: none;
+}
 
 /* ESTILO DE COLORES PARA LA PAGINA*/
 

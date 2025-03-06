@@ -28,6 +28,15 @@ const Navbar: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    // Agregar la clase "no-layout" al body cuando estemos en la página específica
+    if (location.pathname === "/dashboard/pos") {
+      document.body.classList.add("no-layout");
+    } else {
+      document.body.classList.remove("no-layout");
+    }
+  }, [location]);
+
   return (
     <>
       <nav className="bg-nav sticky top-0 z-50 w-full shadow-md">
