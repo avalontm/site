@@ -23,6 +23,8 @@ import SessionExpired from "./pages/SessionExpired"
 import Configuracion from "./dashboard/Configuracion";
 import UsuariosPanel from "./dashboard/UsuariosPanel";
 import UsuarioForm from "./dashboard/UsuarioForm";
+import OrdenesPanel from "./dashboard/OrdenesPanel";
+import VentasPanel from "./dashboard/VentasPanel";
 
 // Carga diferida (lazy loading)
 const Perfil = lazy(() => import("./pages/Perfil"));
@@ -219,6 +221,24 @@ function App() {
                   element={
                     <Suspense fallback={<Loading />}>
                       <UsuarioForm />
+                    </Suspense>
+                  }
+                />  
+
+                <Route
+                  path="/dashboard/ordenes"
+                  element={
+                    <Suspense fallback={<Loading />}>
+                      <OrdenesPanel />
+                    </Suspense>
+                  }
+                />  
+
+                <Route
+                  path="/dashboard/ventas"
+                  element={
+                    <Suspense fallback={<Loading />}>
+                      <VentasPanel />
                     </Suspense>
                   }
                 />  

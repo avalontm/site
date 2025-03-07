@@ -36,13 +36,13 @@ const AdminPanel = () => {
           <span>Gestionar Usuarios</span>
         </Link>
 
-        {/* Revisar Pedidos */}
+        {/* Revisar Ordenes */}
         <Link
-          to="/dashboard/pedidos"
+          to="/dashboard/ordenes"
           className="flex items-center justify-center rounded-lg bg-gradient-to-r from-green-400 to-green-600 px-6 py-4 text-center font-medium text-white shadow-lg transition hover:scale-105 hover:bg-green-700"
         >
           <FaClipboardList className="mr-3 text-3xl" />
-          <span>Revisar Pedidos</span>
+          <span>Revisar Ordenes</span>
         </Link>
 
         {/* Agregar Producto */}

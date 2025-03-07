@@ -53,6 +53,8 @@ const ProductosPanel = () => {
     if (!token) 
       return toast.error("No se encontró el token de autenticación.");
     
+    setLoading(true);
+    
     try {
       const response = await fetch(
         `${config.apiUrl}/producto/panel/pagina?page=${pagina}&categoria=${categoriaSeleccionada}`,
@@ -130,8 +132,8 @@ const ProductosPanel = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-full flex-col items-center rounded-lg bg-white p-8 text-gray-900">
-      <h1 className="text-3xl font-bold">Panel de Productos</h1>
+    <div className="container mx-auto min-h-screen bg-gray-50 p-4">
+      <h1 className="mb-4 text-3xl font-semibold text-gray-800">Panel de Productos</h1>
 
       {loading ? (
         <div className="flex w-full flex-col items-center justify-center p-10">
@@ -144,7 +146,7 @@ const ProductosPanel = () => {
       ) : (
         <>
           {/* Filtro por categoría */}
-          <div className="mt-6 w-full max-w-lg">
+          <div className="mb-6 flex items-center space-x-4">
             <select
               className="w-full rounded-lg bg-gray-100 px-6 py-3 text-gray-900"
               value={categoriaSeleccionada}
@@ -159,19 +161,19 @@ const ProductosPanel = () => {
           </div>
 
           {/* Botón para agregar producto */}
-          <div className="mt-6 max-w-lg">
+          <div className="my-6 max-w-lg">
             <Link
               to="/dashboard/producto"
-              className="w-full rounded-lg bg-black px-6 py-3 text-center font-medium text-white transition hover:bg-gray-950"
+              className="w-full max-w-lg rounded-lg bg-black px-6 py-3 text-center font-medium text-white transition hover:bg-gray-950"
             >
-              Agregar Producto
+              Nuevo Producto
             </Link>
           </div>
 
           {/* Tabla con los productos */}
-          <div className="mt-6 w-full overflow-x-auto rounded-lg bg-gray-50">
-            <table className="min-w-full text-left text-sm text-gray-900">
-              <thead className="bg-gray-200">
+          <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-lg">
+            <table className="min-w-full table-auto bg-white">
+              <thead className="bg-black text-white">
                 <tr>
                   <th className="px-6 py-3">Imagen</th>
                   <th className="px-6 py-3">Nombre</th>

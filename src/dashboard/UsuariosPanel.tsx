@@ -93,18 +93,12 @@ const UsuariosPanel = () => {
       {/* Filtro de búsqueda */}
       <div className="mb-6 flex items-center space-x-4">
         <input
-          type="text"
+          type="search"
           value={search}
           onChange={handleSearchChange}
           placeholder="Buscar usuarios..."
           className="w-full rounded-lg border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button
-          onClick={() => onClearSearch()}
-          className="rounded-lg bg-red-500 px-4 py-2 text-white shadow-md transition duration-200 hover:bg-red-600"
-        >
-          Limpiar
-        </button>
       </div>
 
       {/* Tabla de usuarios */}
