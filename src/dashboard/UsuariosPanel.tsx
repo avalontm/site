@@ -31,6 +31,7 @@ const UsuariosPanel = () => {
 
       if (!response.ok) {
         toast.error('Error al obtener los usuarios');
+        return;
       }
 
       const data = await response.json();
@@ -67,7 +68,7 @@ const UsuariosPanel = () => {
 
   const handleEditUser = (uuid: number) => {
     // Redirigir a la página de edición
-    window.location.href = `/dashboard/usuarios/editar/${uuid}`;
+    window.location.href = `/dashboard/usuario/${uuid}`;
   };
 
   const cambiarPagina = (nuevaPagina: number) => {

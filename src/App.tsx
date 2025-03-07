@@ -22,6 +22,7 @@ import POSPanel from "./dashboard/POSPanel";
 import SessionExpired from "./pages/SessionExpired"
 import Configuracion from "./dashboard/Configuracion";
 import UsuariosPanel from "./dashboard/UsuariosPanel";
+import UsuarioForm from "./dashboard/UsuarioForm";
 
 // Carga diferida (lazy loading)
 const Perfil = lazy(() => import("./pages/Perfil"));
@@ -209,6 +210,15 @@ function App() {
                   element={
                     <Suspense fallback={<Loading />}>
                       <UsuariosPanel />
+                    </Suspense>
+                  }
+                />  
+
+              <Route
+                  path="/dashboard/usuario/:uuid?"
+                  element={
+                    <Suspense fallback={<Loading />}>
+                      <UsuarioForm />
                     </Suspense>
                   }
                 />  
