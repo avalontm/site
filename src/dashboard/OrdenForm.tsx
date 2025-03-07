@@ -1,6 +1,6 @@
 import { CheckCircle, Loader, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import config from "../config";
 
@@ -18,6 +18,8 @@ const OrdenForm = () => {
   const [orden, setOrden] = useState<any>(null);
   const [estado, setEstado] = useState(0);
   const [cargando, setCargando] = useState(true);
+  const navigate = useNavigate();
+
   const defaultImage = "/assets/default-product.png";
 
   useEffect(() => {
@@ -89,37 +91,7 @@ const OrdenForm = () => {
   const completarVenta = async () => {
     if (estado !== 4) return; // Solo permitir completar si está en "Entregada"
 
-    try {
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        toast.error("No se encontró el token de autenticación.");
-        return;
-      }
-
-      // Aquí podrías hacer una petición para marcar la venta como completada en tu backend
-      const respuesta = await fetch(`${config.apiUrl}/orden/completar/${uuid}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await respuesta.json();
-      if (!respuesta.ok) throw new Error(data.message || "Error al completar la venta.");
-
-      toast.success("Venta completada con éxito.");
-    } catch (error) {
-      toast.error(error.message || "No se pudo completar la venta.");
-    }
-  };
-
-  if (cargando) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader className="size-10 animate-spin text-gray-500" />
-      </div>
-    );
+    navigate(`/dashboard/pos/${uuid}`); // Redirige a la página /dashboard/pos/{uuid}
   }
 
   if (!orden) {
@@ -130,7 +102,7 @@ const OrdenForm = () => {
       </div>
     );
   }
-
+  
   return (
     <div className="container mx-auto min-h-min p-6">
       <h1 className="mb-6 text-3xl font-bold text-gray-800">Orden #{orden.numero_orden}</h1>
@@ -206,7 +178,7 @@ const OrdenForm = () => {
         <button
           onClick={completarVenta}
           className={`w-full max-w-sm rounded-lg py-2 text-white ${
-            estado === 4 ? "bg-green-500 hover:bg-green-600" : "bg-gray-400 cursor-not-allowed"
+            estado === 4 ? "bg-green-500 hover:bg-green-600" : "cursor-not-allowed bg-gray-400"
           }`}
           disabled={estado !== 4}
         >

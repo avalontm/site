@@ -9,12 +9,14 @@ import { FaMinus, FaPlus } from "react-icons/fa";
 import { Trash2 } from "lucide-react";
 import Loading from "../components/Loading";
 import { Helmet } from "react-helmet-async";
+import { useParams } from "react-router-dom";
 
 interface CartItem extends Product {
   cantidad: number;
 }
 
 export default function POSPanel() {
+  const { uuid }: { uuid?: string } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]); // Estado para las categorías
   const [products, setProducts] = useState<Product[]>([]);
@@ -36,6 +38,9 @@ export default function POSPanel() {
   const contentRef = useRef<HTMLDivElement>(null);
   const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(true); // Estado de carga de productos
   const defaultImage = "/assets/default-product.png";
+  const [cargando, setCargando] = useState<boolean>(true);
+  const [orden, setOrden] = useState<any>(null);  // Estado para la orden
+
   let debounceTimer: NodeJS.Timeout;
 
   useEffect(() => {
@@ -47,6 +52,78 @@ export default function POSPanel() {
       document.body.classList.remove("no-layout");
     };
   }, []);
+
+  useEffect(() => {
+    const fetchOrden = async () => {
+      if (!uuid) {
+        setCargando(false);
+        return;
+      }
+
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        toast.error("No se encontró el token de autenticación.");
+        setCargando(false);
+        return;
+      }
+
+      setCargando(true);
+
+      try {
+        const respuesta = await fetch(`${config.apiUrl}/orden/panel/${uuid}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!respuesta.ok) {
+          toast.error("Error al obtener la orden.");
+        }
+
+        const data = await respuesta.json();
+        console.log(JSON.stringify(data));
+        if (!data.status) {
+          toast.error(data.message || "Error desconocido.");
+        }
+
+        //registramos la orden en la venta
+        const orden = data.orden;
+
+        if(orden.venta_uuid)
+        {
+          toast.warning("Esta orden ya ha sido marcada como vendida.");
+          return;
+        }
+        
+        setOrden(orden);
+
+        // Actualizar carrito con los productos de la orden
+        const productosCarrito = orden.productos.map((producto: any) => ({
+          uuid: producto.uuid,
+          nombre: producto.nombre,
+          cantidad: producto.cantidad,
+          precio: producto.precio,
+          imagen: producto.imagen || defaultImage,
+        }));
+        setCart(productosCarrito);
+
+        // Actualizar cliente seleccionado (simulación con ID)
+        setSelectedClient({
+          uuid: orden.cliente_uuid,
+          nombre: orden.cliente_nombre,
+          puntos: orden.cliente_puntos,
+        });
+        
+      } catch (error) {
+        toast.error(error.message || "Hubo un problema al cargar la orden.");
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    fetchOrden();  // Llamar a la función para cargar la orden
+  }, [uuid]);  // Dependencia de uuid para volver a llamar cuando cambie
 
   // Función para confirmar la venta como pendiente
   const confirmSaleAsPending = () => {
@@ -67,7 +144,7 @@ export default function POSPanel() {
         toast.error("No se encontró el token de autenticación.");
         return;
       }
-
+      setCargando(true);
       try {
         const response = await fetch(`${config.apiUrl}/categoria/listar`, {
           method: "GET",
@@ -82,6 +159,9 @@ export default function POSPanel() {
       } catch (error) {
         toast.error("Error al cargar las categorías.");
         console.error(error);
+      }finally
+      {
+        setCargando(false);
       }
     };
     fetchCategories();
@@ -95,7 +175,9 @@ export default function POSPanel() {
         toast.error("No se encontró el token de autenticación.");
         return;
       }
-  
+
+      setCargando(true);
+
       try {
         setIsLoadingProducts(true);
         // Llamada a la API con parámetros de página y categoría
@@ -128,6 +210,7 @@ export default function POSPanel() {
       }finally
       {
         setIsLoadingProducts(false);
+        setCargando(false);
       }
     };
   
@@ -178,7 +261,6 @@ export default function POSPanel() {
     });
   };
   
-
   const removeFromCart = (uuid: string) => {
     // Encuentra el producto que se va a eliminar del carrito
     const itemToRemove = cart.find(item => item.uuid === uuid);
@@ -198,7 +280,6 @@ export default function POSPanel() {
     }
   };
   
-
   {/* REALIZAR VENTA */}
   const handleSell = async () => {
     if (cart.length === 0) {
@@ -246,8 +327,19 @@ const continueSell = async() => {
         metodo_pago: paymentMethod,
         monto_pagado: amountPaid,
         puntos_usados: pointsUsed,
+        orden_uuid: orden ? orden.uuid : null,  // Verificación de si orden no es null
       }),
     });
+
+    console.log(JSON.stringify({
+      cliente: selectedClient ? selectedClient.uuid : null,
+      productos: cart,
+      total: totalWithPoints,
+      metodo_pago: paymentMethod,
+      monto_pagado: amountPaid,
+      puntos_usados: pointsUsed,
+      orden_uuid: orden ? orden.uuid : null,  // Verificación de si orden no es null
+    }));
 
     const data = await response.json();
 
@@ -265,6 +357,7 @@ const continueSell = async() => {
     setSelectedClient(null);
     setAmountPaid("");
     setPointsUsed(0);
+    history.pushState(null, "", "/dashboard/pos");
   } catch (error) {
     toast.error(error.message || "Ocurrió un error inesperado");
   } finally {
@@ -402,7 +495,7 @@ const continueSell = async() => {
       window.removeEventListener("resize", actualizarEscala);
     };
   }, []); // La dependencia vacía asegura que se ejecute solo una vez al montar
-  
+
   return (
     <div
       ref={contentRef}

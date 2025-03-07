@@ -21,6 +21,8 @@ const ProductosPanel = () => {
   const [productoAEliminar, setProductoAEliminar] = useState<Product | null>(null);
   const [eliminando, setEliminando] = useState<boolean>(false);  // Estado para seguimiento de eliminación
 
+  const defaultImage = "/assets/default-product.png"; // Imagen por defecto
+
   const cargarCategorias = async () => {
     const token = localStorage.getItem("authToken");
     if (!token) return toast.error("No se encontró el token de autenticación.");
@@ -189,6 +191,7 @@ const ProductosPanel = () => {
                             src={producto.imagen}  // Asegúrate de que el campo 'imagen' tenga la URL correcta
                             alt={producto.nombre}
                             className="size-16 rounded object-cover"
+                            onError={(e) => (e.currentTarget.src = defaultImage)}
                           />
                         </a>
                       ) : (
