@@ -333,18 +333,8 @@ const continueSell = async() => {
       }),
     });
 
-    console.log(JSON.stringify({
-      cliente: selectedClient ? selectedClient.uuid : null,
-      productos: cart,
-      total: totalWithPoints,
-      metodo_pago: paymentMethod,
-      monto_pagado: amountPaid,
-      puntos_usados: pointsUsed,
-      orden_uuid: orden ? orden.uuid : null,  // Verificación de si orden no es null
-    }));
-
     const data = await response.json();
-
+ 
     // Verificar que el status sea True antes de continuar
     if (!response.ok || !data.status) {
       toast.error(data.message || "Error al procesar la venta");
@@ -354,9 +344,9 @@ const continueSell = async() => {
 
     toast.success(`Venta realizada para ${selectedClient ? `${selectedClient.nombre} ${selectedClient.apellido}` : "Público en General"}`);
 
-    if(!data.print)
+    if(data.data)
     {
-      printTicket(data.print);
+      printTicket(data.data);
     }
 
     // Limpiar el estado después de la venta
@@ -372,10 +362,11 @@ const continueSell = async() => {
   }
 };
 
-const printTicket = async (printData: any)  => {
+const printTicket = async (data: any)  => {
 
-  const printer = localStorage.getItem("selectedPrinter");
-  if (!printer) {
+  const savedPrinter = localStorage.getItem("selectedPrinter");
+  let printer = JSON.parse(savedPrinter);
+  if (!printer.name) {
     toast.warning("Selecciona una impresora para imprimir.");
     return;
   }
@@ -384,6 +375,11 @@ const printTicket = async (printData: any)  => {
   if (!apiBaseUrl) {
     toast.error("Por favor, ingresa la URL base de la API.");
     return;
+  }
+
+  const printData = {
+    PrinterName: printer.name,
+    data: data.data 
   }
 
   try {
