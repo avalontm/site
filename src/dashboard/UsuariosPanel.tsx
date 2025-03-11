@@ -79,13 +79,6 @@ const UsuariosPanel = () => {
 
   const totalPaginas = Math.ceil(totalUsuarios / usuariosPorPagina);
 
-  const onClearSearch = () => {
-    setSearch("");
-    setCurrentPage(1); 
-    fetchUsuarios(); 
-  };
-  
-
   return (
     <div className="container mx-auto min-h-screen bg-gray-50 p-4">
       <h1 className="mb-4 text-3xl font-semibold text-gray-800">Gestión de Usuarios</h1>
