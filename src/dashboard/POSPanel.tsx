@@ -10,6 +10,8 @@ import { Trash2 } from "lucide-react";
 import Loading from "../components/Loading";
 import { Helmet } from "react-helmet-async";
 import { useParams } from "react-router-dom";
+import { PrinterButton } from '../components/PrinterButton';
+import { Any } from "@react-spring/web";
 
 interface CartItem extends Product {
   cantidad: number;
@@ -352,6 +354,11 @@ const continueSell = async() => {
 
     toast.success(`Venta realizada para ${selectedClient ? `${selectedClient.nombre} ${selectedClient.apellido}` : "Público en General"}`);
 
+    if(!data.print)
+    {
+      printTicket(data.print);
+    }
+
     // Limpiar el estado después de la venta
     setCart([]);
     setSelectedClient(null);
@@ -362,6 +369,40 @@ const continueSell = async() => {
     toast.error(error.message || "Ocurrió un error inesperado");
   } finally {
     setIsSelling(false); // Finalizar loading
+  }
+};
+
+const printTicket = async (printData: any)  => {
+
+  const printer = localStorage.getItem("selectedPrinter");
+  if (!printer) {
+    toast.warning("Selecciona una impresora para imprimir.");
+    return;
+  }
+
+  const apiBaseUrl = localStorage.getItem("apiPrinter");
+  if (!apiBaseUrl) {
+    toast.error("Por favor, ingresa la URL base de la API.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/print`, {
+      method: "POST",
+      body: JSON.stringify(printData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const responseJson = await response.json();
+    if (responseJson.Success) {
+      toast.success(responseJson.Message);
+    } else {
+      toast.error(responseJson.Message);
+    }
+  } catch (error) {
+    toast.error(`Error al imprimir: ${error}`);
   }
 };
 
