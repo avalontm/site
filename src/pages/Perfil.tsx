@@ -111,13 +111,13 @@ const Perfil: React.FC = () => {
         body: formData
       });
 
-      if (!response.ok) {
-        toast.error('Error al actualizar el perfil');
-        return;
-      }
-
       const data = await response.json();
 
+      if(!data.status)
+      {
+        toast.error(data.message);
+        return;
+      }
       toast.success('Perfil actualizado correctamente');
       setNuevaFoto(null);
       obtenerDatosUsuario();

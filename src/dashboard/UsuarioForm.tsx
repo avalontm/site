@@ -123,9 +123,9 @@ const UsuarioForm: React.FC = () => {
         return;
       }
   
-      toast.success('Usuario actualizado correctamente');
+      toast.success(data.message);
     } catch (err) {
-      toast.error('Error al actualizar los datos del usuario');
+      toast.error(err.message);
     }
   };
   
