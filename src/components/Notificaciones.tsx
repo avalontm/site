@@ -39,7 +39,7 @@ const Notificaciones = () => {
     }
   
     try {
-      const respuesta = await fetch(`${config.apiUrl}/orden/panel/lista?estado=0`, {
+      const respuesta = await fetch(`${config.apiUrl}/orden/panel/listar?estado=0`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
