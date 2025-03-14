@@ -1,17 +1,10 @@
-import { CheckCircle, Loader, XCircle } from "lucide-react";
+import { CheckCircle, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import config from "../config";
-
-const estadosOrden = [
-  { nombre: "Pendiente", color: "text-yellow-500 bg-yellow-100" },
-  { nombre: "Confirmada", color: "text-green-500 bg-green-100" },
-  { nombre: "En proceso", color: "text-blue-500 bg-blue-100" },
-  { nombre: "Enviada", color: "text-purple-500 bg-purple-100" },
-  { nombre: "Entregada", color: "text-teal-500 bg-teal-100" },
-  { nombre: "Cancelada", color: "text-red-500 bg-red-100" }
-];
+import Loading from "../components/Loading";
+import OrderStepper from "../components/OrderStepper"; // Create this component
 
 const OrdenForm = () => {
   const { uuid } = useParams();
@@ -94,6 +87,15 @@ const OrdenForm = () => {
     navigate(`/dashboard/pos/${uuid}`); // Redirige a la página /dashboard/pos/{uuid}
   }
 
+  // Custom Loading Component
+  if (cargando) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center">
+        <Loading/>
+      </div>
+    );
+  }
+
   if (!orden) {
     return (
       <div className="flex h-screen flex-col items-center justify-center">
@@ -107,18 +109,20 @@ const OrdenForm = () => {
     <div className="container mx-auto min-h-min p-6">
       <h1 className="mb-6 text-3xl font-bold text-gray-800">Orden #{orden.numero_orden}</h1>
 
+      {/* Order Status Stepper */}
+      <div className="mb-6">
+        <OrderStepper 
+          currentStep={estado} 
+          onStepChange={(newStep) => setEstado(newStep)} 
+        />
+      </div>
+
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="rounded-lg bg-white p-6 shadow-md">
           <h2 className="mb-4 text-lg font-semibold text-gray-700">Información de la Orden</h2>
-          <p><strong>Cliente:</strong> {orden.nombre_usuario}</p>
+          <p><strong>Cliente:</strong> {orden.cliente_nombre}</p>
           <p><strong>Fecha:</strong> {new Date(orden.fecha_orden).toLocaleString()}</p>
           <p><strong>Tipo de Entrega:</strong> {orden.tipo_entrega || "No aplica"}</p>
-          <p className="mt-3">
-            <strong>Estado:</strong> 
-            <span className={`ml-2 rounded-lg px-2 py-1 font-semibold ${estadosOrden[orden.estado]?.color || "bg-gray-100 text-gray-500"}`}>
-              {estadosOrden[orden.estado]?.nombre || "Desconocido"}
-            </span>
-          </p>
         </div>
 
         <div className="flex items-center justify-center rounded-lg bg-white p-6 shadow-md">
@@ -128,6 +132,7 @@ const OrdenForm = () => {
         </div>
       </div>
 
+      {/* Rest of the component remains the same */}
       <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
         <h2 className="text-lg font-semibold text-gray-700">Productos en la Orden</h2>
         {orden.productos.length > 0 ? (
@@ -153,20 +158,10 @@ const OrdenForm = () => {
         )}
       </div>
 
-      <div className="rounded-lg bg-white p-6 shadow-md">
-        <label className="mb-2 block font-semibold text-gray-700">Estado de la Orden:</label>
-        <select
-          className="w-full rounded-lg border p-2"
-          value={estado}
-          onChange={(e) => setEstado(Number(e.target.value))}
-        >
-          {estadosOrden.map((estado, index) => (
-            <option key={index} value={index}>{estado.nombre}</option>
-          ))}
-        </select>
+      <div className="mt-6 flex justify-center">
         <button
           onClick={actualizarEstado}
-          className="mt-4 flex w-full items-center justify-center rounded-lg bg-blue-500 py-2 text-white hover:bg-blue-600"
+          className="flex w-full max-w-sm items-center justify-center rounded-lg bg-blue-500 py-2 text-white hover:bg-blue-600"
         >
           <CheckCircle className="mr-2 size-5" />
           Guardar cambios
