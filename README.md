@@ -85,6 +85,10 @@ sudo systemctl daemon-reload
 sudo systemctl enable site.service
 ```
 
+```
+sudo nano /etc/nginx/sites-available/moshi
+```
+
 ### NGINX (archivo de configuracion)
 ```
 # Detectar bots antes de definir la configuración del servidor
