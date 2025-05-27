@@ -14,7 +14,9 @@ const UsuarioForm: React.FC = () => {
     telefono: '',
     avatar: '',
     puntos: 0,
+    role: 0
   });
+
   const [loading, setLoading] = useState<boolean>(true);
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -104,6 +106,7 @@ const UsuarioForm: React.FC = () => {
       puntos: usuario.puntos,
       contrasena: password || undefined,
       avatar: avatarBase64 || undefined,
+      role: usuario.role, 
     });
   
     try {
@@ -212,6 +215,25 @@ const UsuarioForm: React.FC = () => {
             required
           />
         </div>
+
+    <div className="mb-4">
+      <label htmlFor="role" className="block text-sm font-semibold text-gray-700">
+        Rol de Usuario
+      </label>
+      <select
+        id="role"
+        name="role"
+        value={usuario.role}
+        onChange={(e) =>
+          setUsuario((prev) => ({ ...prev, role: parseInt(e.target.value) }))
+        }
+        className="mt-1 w-full rounded-md border p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
+        <option value={0}>Usuario Estándar</option>
+        <option value={1}>Generar</option>
+        <option value={99}>Administrador</option>
+      </select>
+    </div>
 
         {/* Subida de Avatar */}
         <div className="mb-4">

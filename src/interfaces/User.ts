@@ -8,4 +8,5 @@ export interface User {
   avatar?: string;
   puntos: number;
   contrasena?: string;  // Agregado para manejar la contraseña
+  role: number;         // 0: Usuario, 1: Administrador, 2: Super Administrador
 }
