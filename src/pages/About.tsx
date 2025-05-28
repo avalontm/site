@@ -6,7 +6,7 @@ const employees: Employee[] = [
   {
     name: "Raul Mendez",
     role: "Desarollador Frontend/Backend",
-    photo: "https://avatars.githubusercontent.com/u/23564932?v=4",
+    photo: "/assets/images/raul-mendez.jpg",
     bio: "Desarrollador con experiencia en React y TailwindCSS.",
     email: "avalontm21@gmail.com",
     linkedin: "https://linkedin.com/in/raul-mendez-754b65111",
@@ -15,7 +15,7 @@ const employees: Employee[] = [
   {
     name: "Arroyo Dominguez Scarleth Yoceleth",
     role: "Ingeniera de Bases de Datos",
-    photo: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
+    photo: "/assets/images/scarleth-arroyo.jpg",
     bio: "Especialista en diseño, optimización y administración de bases de datos MySQL para aplicaciones escalables.",
     email: "scarleth.arroyo@example.com",
     linkedin: "https://linkedin.com/in/scarleth-y-a-72220b352",
@@ -24,7 +24,7 @@ const employees: Employee[] = [
   {
     name: "Mijares Gómez Christofer",
     role: "Diseñador de Interfaz y Experiencia de Usuario",
-    photo: "https://i.pravatar.cc/150?u=a042581f4e290265043",
+    photo: "/assets/images/christofer-mijares.jpg",
     bio: "Encargado del diseño visual del sitio, selección de colores y experiencia de usuario.",
     email: "christofer.mijares@example.com",
     linkedin: "https://linkedin.com/in/christofermijares",
@@ -33,7 +33,7 @@ const employees: Employee[] = [
   {
     name: "Cuevas Sánchez Crisanto de Jesús",
     role: "Especialista en integración continua y despliegue automático.",
-    photo: "https://i.pravatar.cc/150?u=a042581f3e29016705d",
+    photo: "/assets/images/crisanto-cuevas.jpg",
     bio: "Especialista en integración continua y despliegue automático.",
     email: "crisanto.cuevas@example.com",
     linkedin: "https://linkedin.com/in/crisantocuevas",
@@ -43,7 +43,7 @@ const employees: Employee[] = [
   {
     name: "Alejandro Renato Leon Lomeli",
     role: "Científico de Datos",
-    photo: "https://i.pravatar.cc/150?u=f0f2381f4e230265543",
+    photo: "/assets/images/alejandro-leon.jpg",
     bio: "Especialista en análisis de datos, modelado estadístico y machine learning.",
     email: "alejandro.leon@example.com",
     linkedin: "https://linkedin.com/in/alejandroleon",
@@ -52,7 +52,7 @@ const employees: Employee[] = [
   {
     name: "Silvia Eugenia León Lomelí",
     role: "Científica de Datos",
-    photo: "https://i.pravatar.cc/150?u=a04258g4e234263443",
+    photo: "/assets/images/silvia-leon.jpg",
     bio: "Experta en inteligencia artificial y big data, con enfoque en la optimización de procesos.",
     email: "silvia.leon@example.com",
     linkedin: "https://linkedin.com/in/silvialeon",
