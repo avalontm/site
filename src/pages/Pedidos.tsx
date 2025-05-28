@@ -11,6 +11,7 @@ interface Pedido {
   tipo_entrega: string;
   total: number;
   estado: number;
+  review: boolean
 }
 
 const Pedidos: React.FC = () => {
@@ -115,6 +116,7 @@ const Pedidos: React.FC = () => {
                 <th className="border border-gray-300 px-4 py-2">Destino</th>
                 <th className="border border-gray-300 px-4 py-2">Total</th>
                 <th className="border border-gray-300 px-4 py-2">Estado</th>
+                <th className="border border-gray-300 px-4 py-2">Calificado</th>
                 <th className="border border-gray-300 px-4 py-2">Acciones</th>
               </tr>
             </thead>
@@ -131,12 +133,20 @@ const Pedidos: React.FC = () => {
                     {getEstadoTexto(pedido.estado)}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-center">
+                    {pedido.review ? (
+                      <span className="text-green-500">Sí</span>
+                    ) : (
+                      <span className="text-red-500">No</span>
+                    )}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-center">
                     <button
                       className="rounded bg-black px-4 py-1 text-white transition hover:bg-gray-900"
                       onClick={() => navigate(`/pedido/${pedido.numero_orden}`)}
                     >
                       Ver pedido
                     </button>
+
                   </td>
                 </tr>
               ))}
