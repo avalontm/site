@@ -157,10 +157,10 @@ const Perfil: React.FC = () => {
             <div className="relative flex flex-col items-center">
               <label htmlFor="foto-input" className="cursor-pointer">
                 <div className="relative size-24 overflow-hidden rounded-full">
-                  <img
+                  <img className="size-full object-cover transition-opacity duration-300 hover:opacity-70"
                     src={foto || fotoPorDefecto}
                     alt="Foto de perfil"
-                    className="size-full object-cover transition-opacity duration-300 hover:opacity-70"
+                    onError={(e) => (e.currentTarget.src = fotoPorDefecto)}
                   />
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 hover:opacity-100">
                     <Pencil className="size-6 rounded-full bg-black/50 p-1 text-white" />

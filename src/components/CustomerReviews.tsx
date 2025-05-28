@@ -7,6 +7,8 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Star } from "lucide-react";
 
+const defaultImage = "/assets/perfil_default.png"; // Imagen por defecto
+
 interface Review {
   id?: number;
   name: string;
@@ -19,6 +21,7 @@ const CustomerReviews = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
+  
   useEffect(() => {
     const fetchReviews = async () => {
       try {
@@ -75,7 +78,13 @@ const CustomerReviews = () => {
             {reviews.map((review) => (
               <SwiperSlide key={review.id} className="flex justify-center">
                 <div className="w-[90%] max-w-[460px] rounded-lg bg-white p-4 text-center shadow-md">
-                  <img src={review.avatar} alt={review.name} className="mx-auto mb-3 size-16 rounded-full object-cover" />
+
+                  <img className="mx-auto mb-3 size-16 rounded-full object-cover" 
+                  src={review.avatar || defaultImage} 
+                  alt={review.name} 
+                  onError={(e) => (e.currentTarget.src = defaultImage)}
+                  />
+
                   <h3 className="font-semibold text-black dark:text-white">{review.name}</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-300">{review.comment}</p>
                   <div className="mt-2 flex justify-center">

@@ -8,6 +8,9 @@ import config from "../config";
 import Notificaciones from "./Notificaciones";
 import PrinterButton from "./PrinterButton";
 
+const fotoPorDefecto = '/assets/perfil_default.png';
+
+
 const Navbar: React.FC = () => {
   const { isAuthenticated, logout, user, role } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -113,10 +116,10 @@ const Navbar: React.FC = () => {
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         className="bg-login flex w-full items-center justify-center rounded-full p-2 text-sm font-medium"
                       >
-                        <img
-                          src={user?.avatar || "/assets/perfil_default.png"}
+                        <img  className="size-10 rounded-full object-cover"
+                          src={user?.avatar || fotoPorDefecto}
                           alt="Avatar"
-                          className="size-10 rounded-full object-cover"
+                          onError={(e) => (e.currentTarget.src = fotoPorDefecto)}
                         />
                         <FaCaretDown className="ml-2 text-sm" />
                       </button>
