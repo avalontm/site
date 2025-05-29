@@ -26,6 +26,7 @@ import UsuarioForm from "./dashboard/UsuarioForm";
 import OrdenesPanel from "./dashboard/OrdenesPanel";
 import VentasPanel from "./dashboard/VentasPanel";
 import VentaForm from "./dashboard/VentaForm";
+import CarouselForm from "./dashboard/CarouselForm";
 
 // Carga diferida (lazy loading)
 const Perfil = lazy(() => import("./pages/Perfil"));
@@ -249,6 +250,15 @@ function App() {
                   element={
                     <Suspense fallback={<Loading />}>
                       <VentaForm />
+                    </Suspense>
+                  }
+                />  
+
+                 <Route
+                  path="/dashboard/carousel"
+                  element={
+                    <Suspense fallback={<Loading />}>
+                      <CarouselForm />
                     </Suspense>
                   }
                 />  

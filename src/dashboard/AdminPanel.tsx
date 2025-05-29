@@ -63,6 +63,15 @@ const AdminPanel = () => {
           <span>Ver Ventas Realizadas</span>
         </Link>
 
+         {/* Ver Carousel */}
+        <Link
+          to="/dashboard/carousel"
+          className="flex items-center justify-center rounded-lg bg-gradient-to-r from-indigo-400 to-indigo-600 px-6 py-4 text-center font-medium text-white shadow-lg transition hover:scale-105 hover:bg-indigo-700"
+        >
+          <FaRegChartBar className="mr-3 text-3xl" />
+          <span>Ver Carousel</span>
+        </Link>
+
         {/* Configuración del Sitio */}
         <Link
           to="/dashboard/configuracion"
