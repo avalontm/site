@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import config from "../config";
 import { toast } from "react-toastify";
 import { Helmet } from "react-helmet-async";
+import MiniLoading from '../components/MiniLoading';
 
 type CarouselImage = {
   uuid: string;
@@ -12,7 +13,7 @@ const CarouselForm = () => {
   const [images, setImages] = useState<CarouselImage[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
+  const [iswaiting, setIsWaiting] = useState(false);
   const token = localStorage.getItem("authToken");
 
   const fetchImages = async () => {
@@ -55,7 +56,7 @@ const CarouselForm = () => {
 
     const formData = new FormData();
     formData.append("imagen", selectedFile);
-
+    setIsWaiting(true);
     try {
       const res = await fetch(`${config.apiUrl}/imagen/panel/carousel/agregar`, {
         method: "POST",
@@ -79,6 +80,9 @@ const CarouselForm = () => {
     } catch (err) {
       console.error(err);
       toast.error("Error al subir la imagen");
+    }finally
+    {
+      setIsWaiting(false);
     }
   };
 
@@ -123,13 +127,13 @@ const CarouselForm = () => {
 
       <h1 className="mb-4 text-2xl font-bold">Administrar Carrusel</h1>
 
-      <div className="mb-4 flex items-center gap-2">
+      <div className="mb-4 flex items-center gap-2 rounded-lg bg-gray-50 p-6">
         <input type="file" accept="image/*" onChange={handleFileChange} />
         <button
           onClick={handleUpload}
           className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
         >
-          Subir Imagen
+             {iswaiting ? <MiniLoading /> : 'Subir Imagen'} 
         </button>
       </div>
 
