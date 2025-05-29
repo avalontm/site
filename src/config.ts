@@ -4,6 +4,6 @@ const config = {
   descripcion: 'Tu tienda en línea con los mejores productos y ofertas.',
   apiBase: 'http://66.179.189.108', // Asegúrate de que la URL base esté bien configurada
   apiUrl: 'http://66.179.189.108:8081/api', // Asegúrate de que la URL base esté bien configurada
-  socketUrl: 'wss://66.179.189.108',
+  socketUrl: 'ws://66.179.189.108:8081',
 };
 export default config;
